@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"html/template"
 	"net/http"
 )
@@ -11,19 +10,33 @@ type Page struct {
 	Text  string
 }
 
-func index_handler(w http.ResponseWriter, r *http.Request) {
+type Ret struct {
+	Content string
+}
+
+func indexHandler(w http.ResponseWriter, r *http.Request) {
 	p := Page{Title: "This is a templated site", Text: "This is pretty neat"}
 	t, _ := template.ParseFiles("tmpl/index.html")
 	t.Execute(w, p)
 }
 
-func about_handler(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintf(w, "Written by Quinn, according a tutorial by Sentdex on Youtube")
+func getHandler(w http.ResponseWriter, r *http.Request) {
+	t, _ := template.ParseFiles("tmpl/input.html")
+	t.Execute(w, nil)
+}
+
+func returnHandler(w http.ResponseWriter, r *http.Request) {
+	content := r.FormValue("content")
+
+	p := &Ret{Content: string(content)}
+	t, _ := template.ParseFiles("tmpl/output.html")
+	t.Execute(w, p)
 }
 
 func main() {
-	http.HandleFunc("/", index_handler)
-	http.HandleFunc("/about", about_handler)
+	http.HandleFunc("/", indexHandler)
+	http.HandleFunc("/get/", getHandler)
+	http.HandleFunc("/return/", returnHandler)
 
 	http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("static"))))
 
