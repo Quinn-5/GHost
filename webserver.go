@@ -13,7 +13,7 @@ type Page struct {
 
 func index_handler(w http.ResponseWriter, r *http.Request) {
 	p := Page{Title: "This is a templated site", Text: "This is pretty neat"}
-	t, _ := template.ParseFiles("index.html")
+	t, _ := template.ParseFiles("tmpl/index.html")
 	t.Execute(w, p)
 }
 
@@ -24,5 +24,8 @@ func about_handler(w http.ResponseWriter, r *http.Request) {
 func main() {
 	http.HandleFunc("/", index_handler)
 	http.HandleFunc("/about", about_handler)
+
+	http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("static"))))
+
 	http.ListenAndServe(":8000", nil)
 }
