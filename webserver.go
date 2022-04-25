@@ -14,29 +14,31 @@ type Ret struct {
 	Content string
 }
 
-func indexHandler(w http.ResponseWriter, r *http.Request) {
-	p := Page{Title: "This is a templated site", Text: "This is pretty neat"}
-	t, _ := template.ParseFiles("tmpl/index.html")
-	t.Execute(w, p)
+type Server struct {
+	Name   string
+	Owner  string
+	Status string
 }
 
-func getHandler(w http.ResponseWriter, r *http.Request) {
-	t, _ := template.ParseFiles("tmpl/input.html")
+func indexHandler(w http.ResponseWriter, r *http.Request) {
+	t, _ := template.ParseFiles("tmpl/index.html")
 	t.Execute(w, nil)
 }
 
-func returnHandler(w http.ResponseWriter, r *http.Request) {
-	content := r.FormValue("content")
+func createHandler(w http.ResponseWriter, r *http.Request) {
+	t, _ := template.ParseFiles("tmpl/create.html")
+	t.Execute(w, nil)
+}
 
-	p := &Ret{Content: string(content)}
-	t, _ := template.ParseFiles("tmpl/output.html")
-	t.Execute(w, p)
+func consoleHandler(w http.ResponseWriter, r *http.Request) {
+	t, _ := template.ParseFiles("tmpl/console.html")
+	t.Execute(w, nil)
 }
 
 func main() {
 	http.HandleFunc("/", indexHandler)
-	http.HandleFunc("/get/", getHandler)
-	http.HandleFunc("/return/", returnHandler)
+	http.HandleFunc("/create/", createHandler)
+	http.HandleFunc("/console/", consoleHandler)
 
 	http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("static"))))
 
