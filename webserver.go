@@ -5,21 +5,6 @@ import (
 	"net/http"
 )
 
-type Page struct {
-	Title string
-	Text  string
-}
-
-type Ret struct {
-	Content string
-}
-
-type Server struct {
-	Name   string
-	Owner  string
-	Status string
-}
-
 func indexHandler(w http.ResponseWriter, r *http.Request) {
 	t, _ := template.ParseFiles("tmpl/index.html")
 	t.Execute(w, nil)
