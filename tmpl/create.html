@@ -2,9 +2,51 @@
 <html>
     <head>
         <title>Create Server</title>
-        <link rel="stylesheet" href="/static/css/styles.css">
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
     </head>
     <body>
-        <h1>Create an new server</h1>
+        
+        <div class="container">
+            <h1>Create a new server</h1>
+            <div class="form-floating mb-3">
+                <input type="text" class="form-control" id="uname" placeholder="Username">
+                <label for="uname">Username</label>
+            </div>
+            <div class="form-floating mb-3">
+                <input type="text" class="form-control" id="sname" placeholder="Server name">
+                <label for="sname">Server name</label>
+            </div>
+            <div class="form-floating mb-3">
+                <select class="form-select" id="type" aria-label="Floating label select example">
+                    <option value="csgo">CS:GO</option>
+                    <option value="factorio">Factorio</option>
+                    <option value="minecraft">Minecraft</option>
+                    <option value="tf2">Team Fortress 2</option>
+                    <option value="terraria">Terraria</option>
+                </select>
+                <label for="type">Server type</label>
+            </div>
+            <div class="input-group mb-3">
+                <div class="form-floating flex-grow-1">
+                    <input type="text" class="form-control" id="cpu" placeholder="CPU limit">
+                    <label for="cpu">CPU limit</label>
+                </div>
+                <span class="input-group-text" id="cpu">%</span>
+            </div>
+            <div class="input-group mb-3">
+                <div class="form-floating flex-grow-1">
+                    <input type="text" class="form-control" id="ram" placeholder="RAM limit">
+                    <label for="ram">RAM limit</label>
+                </div>
+                <span class="input-group-text" id="ram">GiB</span>
+            </div>
+            <div class="input-group mb-3">
+                <div class="form-floating flex-grow-1">
+                    <input type="text" class="form-control" id="disk" placeholder="Disk size">
+                    <label for="disk">Disk size</label>
+                </div>
+                <span class="input-group-text" id="disk">GiB</span>
+            </div>
+        </div>
     </body>
 </html>

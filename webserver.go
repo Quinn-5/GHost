@@ -20,10 +20,16 @@ func consoleHandler(w http.ResponseWriter, r *http.Request) {
 	t.Execute(w, nil)
 }
 
+func bootstrapHandler(w http.ResponseWriter, r *http.Request) {
+	t, _ := template.ParseFiles("tmpl/test.html")
+	t.Execute(w, nil)
+}
+
 func main() {
 	http.HandleFunc("/", indexHandler)
 	http.HandleFunc("/create/", createHandler)
 	http.HandleFunc("/console/", consoleHandler)
+	http.HandleFunc("/bootstrap/", bootstrapHandler)
 
 	http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("static"))))
 
