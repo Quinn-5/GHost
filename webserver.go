@@ -29,7 +29,6 @@ func main() {
 	http.HandleFunc("/", indexHandler)
 	http.HandleFunc("/create/", createHandler)
 	http.HandleFunc("/console/", consoleHandler)
-	http.HandleFunc("/bootstrap/", bootstrapHandler)
 
 	http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("static"))))
 
