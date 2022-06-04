@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html lang="en-US">
 
 <head>
     <title>Create Server</title>
@@ -8,53 +8,53 @@
 </head>
 
 <body>
-    <form>
-        <div class="container">
-            <h1>Create a new server</h1>
+    <div class="container">
+        <h1>Create a new server</h1>
+        <form method="POST">
             <div class="form-floating mb-3">
-                <input type="text" class="form-control" id="uname" placeholder="Username">
-                <label for="uname">Username</label>
+                <input type="text" class="form-control" id="username" name="username" placeholder="Username">
+                <label for="username">Username</label>
             </div>
             <div class="form-floating mb-3">
-                <input type="text" class="form-control" id="sname" placeholder="Server name">
-                <label for="sname">Server name</label>
+                <input type="text" class="form-control" id="servername" name="servername" placeholder="Server name">
+                <label for="servername">Server name</label>
             </div>
             <div class="form-floating mb-3">
-                <select class="form-select" id="type" aria-label="Floating label select example">
+                <select class="form-select" id="servertype" name="servertype" aria-label="Floating label select example">
                     <option value="csgo">CS:GO</option>
                     <option value="factorio">Factorio</option>
                     <option value="minecraft">Minecraft</option>
                     <option value="tf2">Team Fortress 2</option>
                     <option value="terraria">Terraria</option>
                 </select>
-                <label for="type">Server type</label>
+                <label for="servertype">Server type</label>
             </div>
             <div class="input-group mb-3">
                 <div class="form-floating flex-grow-1">
-                    <input type="text" class="form-control" id="cpu" placeholder="CPU limit">
+                    <input type="text" class="form-control" id="cpu" name="cpu" placeholder="CPU limit">
                     <label for="cpu">CPU limit</label>
                 </div>
-                <span class="input-group-text" id="cpu">%</span>
+                <span class="input-group-text" id="cpu">threads</span>
             </div>
             <div class="input-group mb-3">
                 <div class="form-floating flex-grow-1">
-                    <input type="text" class="form-control" id="ram" placeholder="RAM limit">
+                    <input type="text" class="form-control" id="ram" name="ram" placeholder="RAM limit">
                     <label for="ram">RAM limit</label>
                 </div>
                 <span class="input-group-text" id="ram">GiB</span>
             </div>
             <div class="input-group mb-3">
                 <div class="form-floating flex-grow-1">
-                    <input type="text" class="form-control" id="disk" placeholder="Disk size">
+                    <input type="text" class="form-control" id="disk" name="disk" placeholder="Disk size">
                     <label for="disk">Disk size</label>
                 </div>
                 <span class="input-group-text" id="disk">GiB</span>
             </div>
             <div class="input-group mb-3">
-                <button class="w-100 btn btn-primary btn-lg" type="submit">Submit</button>
+                <input class="w-100 btn btn-primary btn-lg" type="submit" value="Submit"></button>
             </div>
-        </div>
-    </form>
+        </form>
+    </div>
 </body>
 
 </html>
