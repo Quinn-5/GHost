@@ -3,6 +3,10 @@ package main
 import (
 	"html/template"
 	"net/http"
+	"strconv"
+	"strings"
+
+	"github.com/Quinn-5/learning-go/ghost/deployments"
 )
 
 // type serverType string
@@ -58,13 +62,44 @@ func loginHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
-	http.HandleFunc("/", indexHandler)
-	http.HandleFunc("/create/", createHandler)
-	http.HandleFunc("/console/", consoleHandler)
-	http.HandleFunc("/login/", loginHandler)
+	// http.HandleFunc("/", indexHandler)
+	// http.HandleFunc("/create/", createHandler)
+	// http.HandleFunc("/console/", consoleHandler)
+	// http.HandleFunc("/login/", loginHandler)
 
-	http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("static"))))
-	http.Handle("/tmpl/", http.StripPrefix("/tmpl/", http.FileServer(http.Dir("tmpl"))))
+	// http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("static"))))
+	// http.Handle("/tmpl/", http.StripPrefix("/tmpl/", http.FileServer(http.Dir("tmpl"))))
 
-	http.ListenAndServe(":8000", nil)
+	// http.ListenAndServe(":8000", nil)
+
+	username := "Quinn"
+	servername := "candice"
+	servertype := "Minecraft"
+	cpu := "1"
+	var icpu int64
+	if n, err := strconv.ParseInt(cpu, 10, 64); err == nil {
+		icpu = n
+	}
+	ram := "4"
+	var iram int64
+	if n, err := strconv.ParseInt(ram, 10, 64); err == nil {
+		iram = n
+	}
+	disk := "1024"
+	var idisk int64
+	if n, err := strconv.ParseInt(disk, 10, 64); err == nil {
+		idisk = n
+	}
+	println(idisk)
+
+	p := &deployments.ServerConfig{
+		Username:   strings.ToLower(username),
+		Servername: strings.ToLower(servername),
+		Type:       strings.ToLower(servertype),
+		CPU:        icpu,
+		RAM:        iram,
+		Disk:       idisk,
+	}
+
+	p.Create()
 }

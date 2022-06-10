@@ -10,7 +10,10 @@ import (
 	"k8s.io/client-go/kubernetes"
 )
 
-func CreatePersistentVolumeClaim(clientset *kubernetes.Clientset, name string, size resource.Format) {
+// Creates a PersistentVolumeClaim on the cluster in the default namespace, and with the given parameters
+//
+// Size should be the number of bytes requested
+func CreatePersistentVolumeClaim(clientset *kubernetes.Clientset, name string, size int64) {
 	storageClient := clientset.CoreV1().PersistentVolumeClaims(apiv1.NamespaceDefault)
 
 	storageClass := "csi-rbd-sc"
@@ -26,7 +29,7 @@ func CreatePersistentVolumeClaim(clientset *kubernetes.Clientset, name string, s
 			},
 			Resources: apiv1.ResourceRequirements{
 				Requests: apiv1.ResourceList{
-					"storage": resource.Quantity{Format: size},
+					"storage": *resource.NewQuantity(size, resource.DecimalSI),
 				},
 			},
 			StorageClassName: &storageClass,

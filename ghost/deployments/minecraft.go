@@ -17,12 +17,23 @@ import (
 )
 
 type ServerConfig struct {
-	Username   string
+	// Name of user requesting server
+	Username string
+
+	// Name of new server
 	Servername string
-	Type       string
-	CPU        resource.Format
-	RAM        resource.Format
-	Disk       resource.Format
+
+	// Type of server requested
+	Type string
+
+	// Number of CPU cores to assign
+	CPU int64
+
+	// Number of GiB RAM to reserve
+	RAM int64
+
+	// Number of MiB disk space to reserve
+	Disk int64
 }
 
 func (cfg *ServerConfig) Create() error {
@@ -42,6 +53,9 @@ func (cfg *ServerConfig) Create() error {
 	if err != nil {
 		panic(err)
 	}
+
+	cfg.Disk = cfg.Disk * 1024 * 1024
+	cfg.RAM = cfg.RAM * 1024 * 1024 * 1024
 
 	Deploy(clientset, cfg)
 
@@ -85,14 +99,24 @@ func Deploy(clientset *kubernetes.Clientset, config *ServerConfig) {
 							Image: "itzg/minecraft-server",
 							Resources: apiv1.ResourceRequirements{
 								Limits: apiv1.ResourceList{
-									apiv1.ResourceCPU:    resource.Quantity{Format: resource.Format(config.CPU)},
-									apiv1.ResourceMemory: resource.Quantity{Format: resource.Format(config.RAM)},
+									apiv1.ResourceCPU:    *resource.NewQuantity(config.CPU, resource.DecimalSI),
+									apiv1.ResourceMemory: *resource.NewQuantity(config.RAM, resource.DecimalSI),
 								},
 							},
 							VolumeMounts: []apiv1.VolumeMount{
 								{
 									MountPath: "/data",
 									Name:      config.Servername,
+								},
+							},
+						},
+					},
+					Volumes: []apiv1.Volume{
+						{
+							Name: config.Servername,
+							VolumeSource: apiv1.VolumeSource{
+								PersistentVolumeClaim: &apiv1.PersistentVolumeClaimVolumeSource{
+									ClaimName: config.Servername,
 								},
 							},
 						},
