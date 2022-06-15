@@ -34,7 +34,20 @@ func CreateNodeport(clientset *kubernetes.Clientset, name string, internalPort i
 	result, err := servicesClient.Create(context.TODO(), nodeport, metav1.CreateOptions{})
 	if err != nil {
 		panic(err)
+	} else {
+		fmt.Printf("Created NodePort %q.\n", result.GetObjectMeta().GetName())
 	}
-	fmt.Printf("Created NodePort %q.\n", result.GetObjectMeta().GetName())
 
+}
+
+func DeleteNodeport(clientset *kubernetes.Clientset, name string) {
+	servicesClient := clientset.CoreV1().Services(apiv1.NamespaceDefault)
+
+	fmt.Println("Deleting NodePort...")
+	err := servicesClient.Delete(context.TODO(), name, metav1.DeleteOptions{})
+	if err != nil {
+		panic(err)
+	} else {
+		fmt.Printf("Deleted NodePort %q.\n", name)
+	}
 }

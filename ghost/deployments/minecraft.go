@@ -2,65 +2,14 @@ package deployments
 
 import (
 	"context"
-	"flag"
 	"fmt"
-	"path/filepath"
 
 	"github.com/Quinn-5/learning-go/ghost/resources"
 	appsv1 "k8s.io/api/apps/v1"
 	apiv1 "k8s.io/api/core/v1"
-	"k8s.io/apimachinery/pkg/api/resource"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
-	"k8s.io/client-go/tools/clientcmd"
-	"k8s.io/client-go/util/homedir"
 )
-
-type ServerConfig struct {
-	// Name of user requesting server
-	Username string
-
-	// Name of new server
-	Servername string
-
-	// Type of server requested
-	Type string
-
-	// Number of CPU cores to assign
-	CPU int64
-
-	// Number of GiB RAM to reserve
-	RAM int64
-
-	// Number of MiB disk space to reserve
-	Disk int64
-}
-
-func (cfg *ServerConfig) Create() error {
-	var kubeconfig *string
-	if home := homedir.HomeDir(); home != "" {
-		kubeconfig = flag.String("kubeconfig", filepath.Join(home, ".kube", "config"), "(optional) absolute path to the kubeconfig file")
-	} else {
-		kubeconfig = flag.String("kubeconfig", "", "absolute path to the kubeconfig file")
-	}
-	flag.Parse()
-
-	config, err := clientcmd.BuildConfigFromFlags("", *kubeconfig)
-	if err != nil {
-		panic(err)
-	}
-	clientset, err := kubernetes.NewForConfig(config)
-	if err != nil {
-		panic(err)
-	}
-
-	cfg.Disk = cfg.Disk * 1024 * 1024
-	cfg.RAM = cfg.RAM * 1024 * 1024 * 1024
-
-	Deploy(clientset, cfg)
-
-	return nil
-}
 
 func Deploy(clientset *kubernetes.Clientset, config *ServerConfig) {
 
@@ -99,8 +48,8 @@ func Deploy(clientset *kubernetes.Clientset, config *ServerConfig) {
 							Image: "itzg/minecraft-server",
 							Resources: apiv1.ResourceRequirements{
 								Limits: apiv1.ResourceList{
-									apiv1.ResourceCPU:    *resource.NewQuantity(config.CPU, resource.DecimalSI),
-									apiv1.ResourceMemory: *resource.NewQuantity(config.RAM, resource.DecimalSI),
+									apiv1.ResourceCPU:    config.CPU,
+									apiv1.ResourceMemory: config.RAM,
 								},
 							},
 							VolumeMounts: []apiv1.VolumeMount{

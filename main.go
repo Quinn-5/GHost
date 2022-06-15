@@ -3,21 +3,10 @@ package main
 import (
 	"html/template"
 	"net/http"
-	"strconv"
-	"strings"
 
 	"github.com/Quinn-5/learning-go/ghost/deployments"
+	"k8s.io/apimachinery/pkg/api/resource"
 )
-
-// type serverType string
-
-// const (
-// 	CSGO      serverType = "csgo"
-// 	Factorio             = "factorio"
-// 	Minecraft            = "minecraft"
-// 	TF2                  = "tf2"
-// 	Terraria             = "terraria"
-// )
 
 func indexHandler(w http.ResponseWriter, r *http.Request) {
 	t, _ := template.ParseFiles("tmpl/index.html")
@@ -73,33 +62,29 @@ func main() {
 	// http.ListenAndServe(":8000", nil)
 
 	username := "Quinn"
-	servername := "candice"
+	servername := "sugma"
 	servertype := "Minecraft"
-	cpu := "1"
-	var icpu int64
-	if n, err := strconv.ParseInt(cpu, 10, 64); err == nil {
-		icpu = n
+	var cpu resource.Quantity
+	if n, err := resource.ParseQuantity("1"); err == nil {
+		cpu = n
 	}
-	ram := "4"
-	var iram int64
-	if n, err := strconv.ParseInt(ram, 10, 64); err == nil {
-		iram = n
+	var ram resource.Quantity
+	if n, err := resource.ParseQuantity("2Gi"); err == nil {
+		ram = n
 	}
-	disk := "1024"
-	var idisk int64
-	if n, err := strconv.ParseInt(disk, 10, 64); err == nil {
-		idisk = n
+	var disk resource.Quantity
+	if n, err := resource.ParseQuantity("1Gi"); err == nil {
+		disk = n
 	}
-	println(idisk)
 
 	p := &deployments.ServerConfig{
-		Username:   strings.ToLower(username),
-		Servername: strings.ToLower(servername),
-		Type:       strings.ToLower(servertype),
-		CPU:        icpu,
-		RAM:        iram,
-		Disk:       idisk,
+		Username:   username,
+		Servername: servername,
+		Type:       servertype,
+		CPU:        cpu,
+		RAM:        ram,
+		Disk:       disk,
 	}
 
-	p.Create()
+	p.Delete()
 }

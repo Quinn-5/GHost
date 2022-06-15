@@ -13,7 +13,7 @@ import (
 // Creates a PersistentVolumeClaim on the cluster in the default namespace, and with the given parameters
 //
 // Size should be the number of bytes requested
-func CreatePersistentVolumeClaim(clientset *kubernetes.Clientset, name string, size int64) {
+func CreatePersistentVolumeClaim(clientset *kubernetes.Clientset, name string, size resource.Quantity) {
 	storageClient := clientset.CoreV1().PersistentVolumeClaims(apiv1.NamespaceDefault)
 
 	storageClass := "csi-rbd-sc"
@@ -29,7 +29,7 @@ func CreatePersistentVolumeClaim(clientset *kubernetes.Clientset, name string, s
 			},
 			Resources: apiv1.ResourceRequirements{
 				Requests: apiv1.ResourceList{
-					"storage": *resource.NewQuantity(size, resource.DecimalSI),
+					"storage": size,
 				},
 			},
 			StorageClassName: &storageClass,
@@ -41,7 +41,19 @@ func CreatePersistentVolumeClaim(clientset *kubernetes.Clientset, name string, s
 	result, err := storageClient.Create(context.TODO(), pvc, metav1.CreateOptions{})
 	if err != nil {
 		panic(err)
+	} else {
+		fmt.Printf("Created PersistentVolumeClaim %q.\n", result.GetObjectMeta().GetName())
 	}
-	fmt.Printf("Created PersistentVolumeClaim %q.\n", result.GetObjectMeta().GetName())
+}
 
+func DeletePersistentVolumeClaim(clientset *kubernetes.Clientset, name string) {
+	storageClient := clientset.CoreV1().PersistentVolumeClaims(apiv1.NamespaceDefault)
+
+	fmt.Println("Deleting PersistentVolumeClaim...")
+	err := storageClient.Delete(context.TODO(), name, metav1.DeleteOptions{})
+	if err != nil {
+		panic(err)
+	} else {
+		fmt.Printf("Deleted PersistentVolumeClaim %q.\n", name)
+	}
 }
