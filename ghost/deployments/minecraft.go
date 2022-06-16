@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/Quinn-5/learning-go/ghost/resources"
 	"github.com/Quinn-5/learning-go/ghost/servconf"
 	appsv1 "k8s.io/api/apps/v1"
 	apiv1 "k8s.io/api/core/v1"
@@ -74,9 +73,6 @@ func Deploy(config *servconf.ServerConfig) {
 			},
 		},
 	}
-
-	resources.CreateNodeport(config, 25565, apiv1.ProtocolTCP)
-	resources.CreatePersistentVolumeClaim(config)
 
 	fmt.Println("Creating deployment...")
 	result, err := deploymentsClient.Create(context.TODO(), deployment, metav1.CreateOptions{})

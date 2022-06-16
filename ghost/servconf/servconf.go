@@ -5,6 +5,7 @@ import (
 	"path/filepath"
 	"strings"
 
+	apiv1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/tools/clientcmd"
@@ -30,6 +31,10 @@ type ServerConfig struct {
 
 	// Number of MiB disk space to reserve
 	Disk resource.Quantity
+
+	port int32
+
+	protocol apiv1.Protocol
 
 	kubeconfig *kubernetes.Clientset
 }
@@ -61,4 +66,20 @@ func (cfg *ServerConfig) Init() error {
 
 func (cfg *ServerConfig) GetKubeConfig() *kubernetes.Clientset {
 	return cfg.kubeconfig
+}
+
+func (cfg *ServerConfig) SetPort(port int32) {
+	cfg.port = port
+}
+
+func (cfg *ServerConfig) GetPort() int32 {
+	return cfg.port
+}
+
+func (cfg *ServerConfig) SetProtocol(protocol apiv1.Protocol) {
+	cfg.protocol = protocol
+}
+
+func (cfg *ServerConfig) GetProtocol() apiv1.Protocol {
+	return cfg.protocol
 }

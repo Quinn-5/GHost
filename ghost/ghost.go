@@ -38,6 +38,8 @@ func Create(config *servconf.ServerConfig) error {
 	config.Init()
 
 	deployments.Deploy(config)
+	resources.CreateNodeport(config)
+	resources.CreatePersistentVolumeClaim(config)
 
 	return nil
 }

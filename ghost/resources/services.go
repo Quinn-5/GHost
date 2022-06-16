@@ -9,7 +9,7 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
-func CreateNodeport(config *servconf.ServerConfig, internalPort int32, protocol apiv1.Protocol) {
+func CreateNodeport(config *servconf.ServerConfig) {
 	servicesClient := config.GetKubeConfig().CoreV1().Services(apiv1.NamespaceDefault)
 
 	nodeport := &apiv1.Service{
@@ -22,8 +22,8 @@ func CreateNodeport(config *servconf.ServerConfig, internalPort int32, protocol 
 			},
 			Ports: []apiv1.ServicePort{
 				{
-					Port:     internalPort,
-					Protocol: protocol,
+					Port:     config.GetPort(),
+					Protocol: config.GetProtocol(),
 				},
 			},
 			Type: apiv1.ServiceTypeNodePort,
