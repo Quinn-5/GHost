@@ -15,14 +15,9 @@ limitations under the License.
 package ghost
 
 import (
-	"context"
-	"fmt"
-
 	"github.com/Quinn-5/learning-go/ghost/deployments"
 	"github.com/Quinn-5/learning-go/ghost/resources"
 	"github.com/Quinn-5/learning-go/ghost/servconf"
-	apiv1 "k8s.io/api/core/v1"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	//
 	// Uncomment to load all auth plugins
 	// _ "k8s.io/client-go/plugin/pkg/client/auth"
@@ -37,7 +32,8 @@ import (
 func Create(config *servconf.ServerConfig) error {
 	config.Init()
 
-	deployments.Deploy(config)
+	deployment := deployments.Minecraft(config)
+	resources.CreateDeployment(config, deployment)
 	resources.CreateNodeport(config)
 	resources.CreatePersistentVolumeClaim(config)
 
@@ -49,15 +45,7 @@ func Delete(config *servconf.ServerConfig) error {
 
 	resources.DeleteNodeport(config)
 	resources.DeletePersistentVolumeClaim(config)
+	resources.DeleteDeployment(config)
 
-	deploymentClient := config.GetKubeConfig().AppsV1().Deployments(apiv1.NamespaceDefault)
-	fmt.Println("Deleting Deployment...")
-	err := deploymentClient.Delete(context.TODO(), config.Servername, metav1.DeleteOptions{})
-	if err != nil {
-		panic(err)
-	} else {
-		fmt.Printf("Deleted Deployment %q.\n", config.Servername)
-	}
-
-	return err
+	return nil
 }

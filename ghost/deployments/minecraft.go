@@ -1,19 +1,13 @@
 package deployments
 
 import (
-	"context"
-	"fmt"
-
 	"github.com/Quinn-5/learning-go/ghost/servconf"
 	appsv1 "k8s.io/api/apps/v1"
 	apiv1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
-func Deploy(config *servconf.ServerConfig) {
-
-	deploymentsClient := config.GetKubeConfig().AppsV1().Deployments(apiv1.NamespaceDefault)
-
+func Minecraft(config *servconf.ServerConfig) *appsv1.Deployment {
 	deployment := &appsv1.Deployment{
 		ObjectMeta: metav1.ObjectMeta{
 			Name: config.Servername,
@@ -77,12 +71,7 @@ func Deploy(config *servconf.ServerConfig) {
 	config.SetPort(25565)
 	config.SetProtocol(apiv1.ProtocolTCP)
 
-	fmt.Println("Creating deployment...")
-	result, err := deploymentsClient.Create(context.TODO(), deployment, metav1.CreateOptions{})
-	if err != nil {
-		panic(err)
-	}
-	fmt.Printf("Created deployment %q.\n", result.GetObjectMeta().GetName())
+	return deployment
 }
 
 func int32Ptr(i int32) *int32 { return &i }
