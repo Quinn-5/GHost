@@ -87,6 +87,6 @@ func main() {
 		Disk:       disk,
 	}
 
-	ghost.Create(p)
+	ghost.Delete(p)
 
 }

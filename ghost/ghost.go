@@ -30,12 +30,13 @@ import (
 )
 
 func Create(config *servconf.ServerConfig) error {
+	// This is probably BAD!!! but I'll fix it whenever I figure out best practices
 	config.Init()
 
-	deployment := deployments.Minecraft(config)
-	resources.CreateDeployment(config, deployment)
+	deployment := deployments.EmptyDeployment(config)
 	resources.CreateNodeport(config)
 	resources.CreatePersistentVolumeClaim(config)
+	resources.CreateDeployment(config, deployment)
 
 	return nil
 }
