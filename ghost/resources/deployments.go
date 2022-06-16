@@ -23,6 +23,7 @@ func CreateDeployment(config *servconf.ServerConfig, deployment *appsv1.Deployme
 
 func DeleteDeployment(config *servconf.ServerConfig) {
 	deploymentClient := config.GetKubeConfig().AppsV1().Deployments(apiv1.NamespaceDefault)
+
 	fmt.Println("Deleting Deployment...")
 	err := deploymentClient.Delete(context.TODO(), config.Servername, metav1.DeleteOptions{})
 	if err != nil {

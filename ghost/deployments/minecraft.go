@@ -73,5 +73,3 @@ func Minecraft(config *servconf.ServerConfig) *appsv1.Deployment {
 
 	return deployment
 }
-
-func int32Ptr(i int32) *int32 { return &i }

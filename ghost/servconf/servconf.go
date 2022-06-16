@@ -42,7 +42,7 @@ type ServerConfig struct {
 	kubeconfig *kubernetes.Clientset
 }
 
-// Cleans inputs to be used for kube api request
+// Generates config and cleans inputs
 func (cfg *ServerConfig) Init() error {
 	var kubeconfig *string
 	if home := homedir.HomeDir(); home != "" {
