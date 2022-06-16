@@ -1,16 +1,11 @@
-package deployments
+package servconf
 
 import (
-	"context"
 	"flag"
-	"fmt"
 	"path/filepath"
 	"strings"
 
-	"github.com/Quinn-5/learning-go/ghost/resources"
-	apiv1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/tools/clientcmd"
 	"k8s.io/client-go/util/homedir"
@@ -40,7 +35,7 @@ type ServerConfig struct {
 }
 
 // Cleans inputs to be used for kube api request
-func (cfg *ServerConfig) clean() error {
+func (cfg *ServerConfig) Init() error {
 	var kubeconfig *string
 	if home := homedir.HomeDir(); home != "" {
 		kubeconfig = flag.String("kubeconfig", filepath.Join(home, ".kube", "config"), "(optional) absolute path to the kubeconfig file")
@@ -64,28 +59,6 @@ func (cfg *ServerConfig) clean() error {
 	return nil
 }
 
-func (cfg *ServerConfig) Create() error {
-	cfg.clean()
-
-	Deploy(cfg.kubeconfig, cfg)
-
-	return nil
-}
-
-func (cfg *ServerConfig) Delete() error {
-	cfg.clean()
-
-	resources.DeleteNodeport(cfg.kubeconfig, cfg.Servername)
-	resources.DeletePersistentVolumeClaim(cfg.kubeconfig, cfg.Servername)
-
-	deploymentClient := cfg.kubeconfig.AppsV1().Deployments(apiv1.NamespaceDefault)
-	fmt.Println("Deleting Deployment...")
-	err := deploymentClient.Delete(context.TODO(), cfg.Servername, metav1.DeleteOptions{})
-	if err != nil {
-		panic(err)
-	} else {
-		fmt.Printf("Deleted Deployment %q.\n", cfg.Servername)
-	}
-
-	return err
+func (cfg *ServerConfig) GetKubeConfig() *kubernetes.Clientset {
+	return cfg.kubeconfig
 }

@@ -5,15 +5,15 @@ import (
 	"fmt"
 
 	"github.com/Quinn-5/learning-go/ghost/resources"
+	"github.com/Quinn-5/learning-go/ghost/servconf"
 	appsv1 "k8s.io/api/apps/v1"
 	apiv1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/client-go/kubernetes"
 )
 
-func Deploy(clientset *kubernetes.Clientset, config *ServerConfig) {
+func Deploy(config *servconf.ServerConfig) {
 
-	deploymentsClient := clientset.AppsV1().Deployments(apiv1.NamespaceDefault)
+	deploymentsClient := config.GetKubeConfig().AppsV1().Deployments(apiv1.NamespaceDefault)
 
 	deployment := &appsv1.Deployment{
 		ObjectMeta: metav1.ObjectMeta{
@@ -75,8 +75,8 @@ func Deploy(clientset *kubernetes.Clientset, config *ServerConfig) {
 		},
 	}
 
-	resources.CreateNodeport(clientset, config.Servername, 25565, apiv1.ProtocolTCP)
-	resources.CreatePersistentVolumeClaim(clientset, config.Servername, config.Disk)
+	resources.CreateNodeport(config, 25565, apiv1.ProtocolTCP)
+	resources.CreatePersistentVolumeClaim(config)
 
 	fmt.Println("Creating deployment...")
 	result, err := deploymentsClient.Create(context.TODO(), deployment, metav1.CreateOptions{})

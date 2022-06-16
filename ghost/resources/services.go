@@ -4,21 +4,21 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/Quinn-5/learning-go/ghost/servconf"
 	apiv1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/client-go/kubernetes"
 )
 
-func CreateNodeport(clientset *kubernetes.Clientset, name string, internalPort int32, protocol apiv1.Protocol) {
-	servicesClient := clientset.CoreV1().Services(apiv1.NamespaceDefault)
+func CreateNodeport(config *servconf.ServerConfig, internalPort int32, protocol apiv1.Protocol) {
+	servicesClient := config.GetKubeConfig().CoreV1().Services(apiv1.NamespaceDefault)
 
 	nodeport := &apiv1.Service{
 		ObjectMeta: metav1.ObjectMeta{
-			Name: name,
+			Name: config.Servername,
 		},
 		Spec: apiv1.ServiceSpec{
 			Selector: map[string]string{
-				"app": name,
+				"app": config.Servername,
 			},
 			Ports: []apiv1.ServicePort{
 				{
@@ -40,14 +40,14 @@ func CreateNodeport(clientset *kubernetes.Clientset, name string, internalPort i
 
 }
 
-func DeleteNodeport(clientset *kubernetes.Clientset, name string) {
-	servicesClient := clientset.CoreV1().Services(apiv1.NamespaceDefault)
+func DeleteNodeport(config *servconf.ServerConfig) {
+	servicesClient := config.GetKubeConfig().CoreV1().Services(apiv1.NamespaceDefault)
 
 	fmt.Println("Deleting NodePort...")
-	err := servicesClient.Delete(context.TODO(), name, metav1.DeleteOptions{})
+	err := servicesClient.Delete(context.TODO(), config.Servername, metav1.DeleteOptions{})
 	if err != nil {
 		panic(err)
 	} else {
-		fmt.Printf("Deleted NodePort %q.\n", name)
+		fmt.Printf("Deleted NodePort %q.\n", config.Servername)
 	}
 }

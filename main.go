@@ -4,7 +4,8 @@ import (
 	"html/template"
 	"net/http"
 
-	"github.com/Quinn-5/learning-go/ghost/deployments"
+	"github.com/Quinn-5/learning-go/ghost"
+	"github.com/Quinn-5/learning-go/ghost/servconf"
 	"k8s.io/apimachinery/pkg/api/resource"
 )
 
@@ -77,7 +78,7 @@ func main() {
 		disk = n
 	}
 
-	p := &deployments.ServerConfig{
+	p := &servconf.ServerConfig{
 		Username:   username,
 		Servername: servername,
 		Type:       servertype,
@@ -86,5 +87,6 @@ func main() {
 		Disk:       disk,
 	}
 
-	p.Delete()
+	ghost.Create(p)
+
 }
