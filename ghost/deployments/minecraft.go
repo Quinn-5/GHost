@@ -74,6 +74,9 @@ func Deploy(config *servconf.ServerConfig) {
 		},
 	}
 
+	config.SetPort(25565)
+	config.SetProtocol(apiv1.ProtocolTCP)
+
 	fmt.Println("Creating deployment...")
 	result, err := deploymentsClient.Create(context.TODO(), deployment, metav1.CreateOptions{})
 	if err != nil {

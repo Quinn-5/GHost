@@ -32,10 +32,13 @@ type ServerConfig struct {
 	// Number of MiB disk space to reserve
 	Disk resource.Quantity
 
+	// Internal port to be exposed
 	port int32
 
+	// Protocol used for communication
 	protocol apiv1.Protocol
 
+	// kubeconfig
 	kubeconfig *kubernetes.Clientset
 }
 
@@ -68,18 +71,18 @@ func (cfg *ServerConfig) GetKubeConfig() *kubernetes.Clientset {
 	return cfg.kubeconfig
 }
 
-func (cfg *ServerConfig) SetPort(port int32) {
-	cfg.port = port
-}
-
 func (cfg *ServerConfig) GetPort() int32 {
 	return cfg.port
 }
 
-func (cfg *ServerConfig) SetProtocol(protocol apiv1.Protocol) {
-	cfg.protocol = protocol
+func (cfg *ServerConfig) SetPort(port int32) {
+	cfg.port = port
 }
 
 func (cfg *ServerConfig) GetProtocol() apiv1.Protocol {
 	return cfg.protocol
+}
+
+func (cfg *ServerConfig) SetProtocol(protocol apiv1.Protocol) {
+	cfg.protocol = protocol
 }
