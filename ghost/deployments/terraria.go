@@ -7,7 +7,8 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
-func Minecraft(config *servconf.ServerConfig) *appsv1.Deployment {
+// An empty example of a functional deployment. For use in testing or creating new deployments
+func Terraria(config *servconf.ServerConfig) *appsv1.Deployment {
 	deployment := &appsv1.Deployment{
 		ObjectMeta: metav1.ObjectMeta{
 			Name: config.Servername,
@@ -31,14 +32,14 @@ func Minecraft(config *servconf.ServerConfig) *appsv1.Deployment {
 				Spec: apiv1.PodSpec{
 					Containers: []apiv1.Container{
 						{
-							Name: config.Servername,
-							Env: []apiv1.EnvVar{
-								{
-									Name:  "EULA",
-									Value: "TRUE",
-								},
+							Name:  config.Servername,
+							Image: "ryshe/terraria",
+							Args: []string{
+								"-world",
+								"/root/.local/share/Terraria/Worlds/" + config.Servername + ".wld",
+								"-autocreate",
+								"2",
 							},
-							Image: "itzg/minecraft-server",
 							Stdin: true,
 							TTY:   true,
 							Resources: apiv1.ResourceRequirements{
@@ -47,9 +48,10 @@ func Minecraft(config *servconf.ServerConfig) *appsv1.Deployment {
 									apiv1.ResourceMemory: config.RAM,
 								},
 							},
+
 							VolumeMounts: []apiv1.VolumeMount{
 								{
-									MountPath: "/data",
+									MountPath: "/root/.local/share/Terraria/Worlds",
 									Name:      config.Servername,
 								},
 							},
@@ -70,7 +72,7 @@ func Minecraft(config *servconf.ServerConfig) *appsv1.Deployment {
 		},
 	}
 
-	config.SetPort(25565)
+	config.SetPort(7777)
 	config.SetProtocol(apiv1.ProtocolTCP)
 
 	return deployment

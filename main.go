@@ -63,8 +63,8 @@ func main() {
 	// http.ListenAndServe(":8000", nil)
 
 	username := "Quinn"
-	servername := "sugma"
-	servertype := "Minecraft"
+	servername := "test"
+	servertype := "Terraria"
 	var cpu resource.Quantity
 	if n, err := resource.ParseQuantity("1"); err == nil {
 		cpu = n
@@ -87,6 +87,6 @@ func main() {
 		Disk:       disk,
 	}
 
-	ghost.Delete(p)
+	ghost.Create(p)
 
 }

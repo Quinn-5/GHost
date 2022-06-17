@@ -33,7 +33,7 @@ func Create(config *servconf.ServerConfig) error {
 	// This is probably BAD!!! but I'll fix it whenever I figure out best practices
 	config.Init()
 
-	deployment := deployments.EmptyDeployment(config)
+	deployment := deployments.Terraria(config)
 	resources.CreateNodeport(config)
 	resources.CreatePersistentVolumeClaim(config)
 	resources.CreateDeployment(config, deployment)
