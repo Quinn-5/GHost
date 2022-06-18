@@ -15,9 +15,12 @@ limitations under the License.
 package ghost
 
 import (
+	"errors"
+
 	"github.com/Quinn-5/learning-go/ghost/deployments"
 	"github.com/Quinn-5/learning-go/ghost/resources"
 	"github.com/Quinn-5/learning-go/ghost/servconf"
+	v1 "k8s.io/api/apps/v1"
 	//
 	// Uncomment to load all auth plugins
 	// _ "k8s.io/client-go/plugin/pkg/client/auth"
@@ -33,7 +36,17 @@ func Create(config *servconf.ServerConfig) error {
 	// This is probably BAD!!! but I'll fix it whenever I figure out best practices
 	config.Init()
 
-	deployment := deployments.Terraria(config)
+	var deployment *v1.Deployment
+
+	switch config.Type {
+	case "minecraft":
+		deployment = deployments.Minecraft(config)
+	case "terraria":
+		deployment = deployments.Terraria(config)
+	default:
+		return errors.New("Invalid server type")
+	}
+
 	resources.CreateNodeport(config)
 	resources.CreatePersistentVolumeClaim(config)
 	resources.CreateDeployment(config, deployment)

@@ -51,3 +51,18 @@ func DeleteNodeport(config *servconf.ServerConfig) {
 		fmt.Printf("Deleted NodePort %q.\n", config.Servername)
 	}
 }
+
+func GetExternalPort(config *servconf.ServerConfig) int32 {
+	servicesClient := config.GetKubeConfig().CoreV1().Services(apiv1.NamespaceDefault)
+
+	fmt.Println("Deleting NodePort...")
+	result, err := servicesClient.Get(context.TODO(), config.Servername, metav1.GetOptions{})
+	if err != nil {
+		panic(err)
+	} else {
+		fmt.Printf("Deleted NodePort %q.\n", config.Servername)
+	}
+	port := result.Spec.Ports[0].NodePort
+
+	return port
+}
