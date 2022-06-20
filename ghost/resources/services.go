@@ -15,6 +15,9 @@ func CreateNodeport(config *servconf.ServerConfig) {
 	nodeport := &apiv1.Service{
 		ObjectMeta: metav1.ObjectMeta{
 			Name: config.Servername,
+			Labels: map[string]string{
+				"user": config.Username,
+			},
 		},
 		Spec: apiv1.ServiceSpec{
 			Selector: map[string]string{

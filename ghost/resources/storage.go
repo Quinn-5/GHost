@@ -21,6 +21,9 @@ func CreatePersistentVolumeClaim(config *servconf.ServerConfig) {
 	pvc := &apiv1.PersistentVolumeClaim{
 		ObjectMeta: metav1.ObjectMeta{
 			Name: config.Servername,
+			Labels: map[string]string{
+				"user": config.Username,
+			},
 		},
 		Spec: apiv1.PersistentVolumeClaimSpec{
 			AccessModes: []apiv1.PersistentVolumeAccessMode{
