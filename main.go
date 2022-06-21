@@ -30,11 +30,11 @@ func createHandler(w http.ResponseWriter, r *http.Request) {
 		cpu = n
 	}
 	var ram resource.Quantity
-	if n, err := resource.ParseQuantity(r.FormValue("ram")); err == nil {
+	if n, err := resource.ParseQuantity(r.FormValue("ram") + "Gi"); err == nil {
 		ram = n
 	}
 	var disk resource.Quantity
-	if n, err := resource.ParseQuantity(r.FormValue("disk")); err == nil {
+	if n, err := resource.ParseQuantity(r.FormValue("disk") + "Gi"); err == nil {
 		disk = n
 	}
 
