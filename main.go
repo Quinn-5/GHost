@@ -52,6 +52,13 @@ func createHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
+
+	http.Redirect(w, r, "/result/", http.StatusFound)
+}
+
+func resultHandler(w http.ResponseWriter, r *http.Request) {
+	t, _ := template.ParseFiles("tmpl/result.html")
+	t.Execute(w, nil)
 }
 
 func consoleHandler(w http.ResponseWriter, r *http.Request) {
@@ -70,9 +77,11 @@ func main() {
 	mux.HandleFunc("/create/", createHandler)
 	mux.HandleFunc("/console/", consoleHandler)
 	mux.HandleFunc("/login/", loginHandler)
+	mux.HandleFunc("/result/", resultHandler)
 
 	fs := http.FileServer(http.Dir("static/"))
 	mux.Handle("/static/", http.StripPrefix("/static/", fs))
+	mux.Handle("/tmpl/", http.StripPrefix("/tmpl/", http.FileServer(http.Dir("tmpl"))))
 
 	http.ListenAndServe(":8000", mux)
 }
