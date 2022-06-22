@@ -39,6 +39,8 @@ func Create(config *servconf.ServerConfig) error {
 	var deployment *v1.Deployment
 
 	switch config.Type {
+	case "factorio":
+		deployment = deployments.Factorio(config)
 	case "minecraft":
 		deployment = deployments.Minecraft(config)
 	case "terraria":
