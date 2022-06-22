@@ -63,3 +63,16 @@ func Delete(config *servconf.ServerConfig) error {
 
 	return nil
 }
+
+func GetAddress(user string, server string) *servconf.Address {
+	config := &servconf.ServerConfig{
+		Username:   user,
+		Servername: server,
+	}
+	address := &servconf.Address{
+		Port: resources.GetExternalPort(config),
+		IP:   resources.GetNodeIP(config),
+	}
+	println(address)
+	return address
+}

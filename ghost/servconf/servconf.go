@@ -42,6 +42,14 @@ type ServerConfig struct {
 	kubeconfig *kubernetes.Clientset
 }
 
+type Address struct {
+	// IP used to access server
+	IP string
+
+	// External connection port
+	Port int32
+}
+
 // Generates config and cleans inputs
 func (cfg *ServerConfig) Init() error {
 	var kubeconfig *string
