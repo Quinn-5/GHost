@@ -17,9 +17,9 @@ package ghost
 import (
 	"errors"
 
-	"github.com/Quinn-5/learning-go/ghost/deployments"
-	"github.com/Quinn-5/learning-go/ghost/resources"
-	"github.com/Quinn-5/learning-go/ghost/servconf"
+	"github.com/Quinn-5/GHost/ghost/deployments"
+	"github.com/Quinn-5/GHost/ghost/resources"
+	"github.com/Quinn-5/GHost/ghost/servconf"
 	v1 "k8s.io/api/apps/v1"
 	//
 	// Uncomment to load all auth plugins

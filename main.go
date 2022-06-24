@@ -4,8 +4,9 @@ import (
 	"html/template"
 	"net/http"
 
-	"github.com/Quinn-5/learning-go/ghost"
-	"github.com/Quinn-5/learning-go/ghost/servconf"
+	"github.com/Quinn-5/GHost/ghost"
+	"github.com/Quinn-5/GHost/ghost/servconf"
+	"github.com/gin-gonic/gin"
 	"k8s.io/apimachinery/pkg/api/resource"
 )
 
