@@ -10,12 +10,12 @@ import (
 )
 
 func indexHandler(w http.ResponseWriter, r *http.Request) {
-	t, _ := template.ParseFiles("tmpl/index.html")
+	t, _ := template.ParseFiles("tmpl/base.html", "tmpl/index.html")
 	t.Execute(w, nil)
 }
 
 func createHandler(w http.ResponseWriter, r *http.Request) {
-	t, _ := template.ParseFiles("tmpl/create.html")
+	t, _ := template.ParseFiles("tmpl/base.html", "tmpl/create.html")
 
 	if r.Method != http.MethodPost {
 		t.Execute(w, nil)
@@ -57,17 +57,17 @@ func createHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func resultHandler(w http.ResponseWriter, r *http.Request) {
-	t, _ := template.ParseFiles("tmpl/result.html")
+	t, _ := template.ParseFiles("tmpl/base.html", "tmpl/result.html")
 	t.Execute(w, nil)
 }
 
 func consoleHandler(w http.ResponseWriter, r *http.Request) {
-	t, _ := template.ParseFiles("tmpl/console.html")
+	t, _ := template.ParseFiles("tmpl/base.html", "tmpl/console.html")
 	t.Execute(w, nil)
 }
 
 func loginHandler(w http.ResponseWriter, r *http.Request) {
-	t, _ := template.ParseFiles("tmpl/login.html")
+	t, _ := template.ParseFiles("tmpl/base.html", "tmpl/login.html")
 	t.Execute(w, nil)
 }
 
