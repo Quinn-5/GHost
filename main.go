@@ -81,7 +81,6 @@ func main() {
 
 	fs := http.FileServer(http.Dir("static/"))
 	mux.Handle("/static/", http.StripPrefix("/static/", fs))
-	mux.Handle("/tmpl/", http.StripPrefix("/tmpl/", http.FileServer(http.Dir("tmpl"))))
 
 	http.ListenAndServe(":8000", mux)
 }
