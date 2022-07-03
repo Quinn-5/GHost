@@ -64,12 +64,10 @@ func resultHandler() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		var username string
 		if cookie, err := ctx.Cookie("username"); err == nil {
-			println(cookie)
 			username = cookie
 		}
 		var servername string
 		if cookie, err := ctx.Cookie("servername"); err == nil {
-			println(cookie)
 			servername = cookie
 		}
 
@@ -79,7 +77,6 @@ func resultHandler() gin.HandlerFunc {
 		}
 
 		ghost.GetAddress(conf)
-		println(conf.IP, conf.ExternalPort)
 
 		ctx.HTML(http.StatusOK, "result", conf)
 	}
