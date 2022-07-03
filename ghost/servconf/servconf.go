@@ -33,7 +33,10 @@ type ServerConfig struct {
 	Disk resource.Quantity
 
 	// Internal port to be exposed
-	port int32
+	internalPort int32
+
+	// External port to connect
+	externalPort int32
 
 	// Protocol used for communication
 	protocol apiv1.Protocol
@@ -80,11 +83,15 @@ func (cfg *ServerConfig) GetKubeConfig() *kubernetes.Clientset {
 }
 
 func (cfg *ServerConfig) GetPort() int32 {
-	return cfg.port
+	return cfg.internalPort
 }
 
-func (cfg *ServerConfig) SetPort(port int32) {
-	cfg.port = port
+func (cfg *ServerConfig) SetInternalPort(port int32) {
+	cfg.internalPort = port
+}
+
+func (cfg *ServerConfig) SetExternalPort(port int32) {
+	cfg.externalPort = port
 }
 
 func (cfg *ServerConfig) GetProtocol() apiv1.Protocol {

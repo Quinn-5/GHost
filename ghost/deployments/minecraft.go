@@ -70,7 +70,7 @@ func Minecraft(config *servconf.ServerConfig) *appsv1.Deployment {
 		},
 	}
 
-	config.SetPort(25565)
+	config.SetInternalPort(25565)
 	config.SetProtocol(apiv1.ProtocolTCP)
 
 	return deployment

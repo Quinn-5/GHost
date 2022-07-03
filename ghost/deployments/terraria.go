@@ -72,7 +72,7 @@ func Terraria(config *servconf.ServerConfig) *appsv1.Deployment {
 		},
 	}
 
-	config.SetPort(7777)
+	config.SetInternalPort(7777)
 	config.SetProtocol(apiv1.ProtocolTCP)
 
 	return deployment

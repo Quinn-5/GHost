@@ -72,7 +72,7 @@ func EmptyDeployment(config *servconf.ServerConfig) *appsv1.Deployment {
 	}
 
 	// Set accordingly
-	config.SetPort(80)
+	config.SetInternalPort(80)
 	// Game protocol is almost always TCP, but some implementations differ.
 	config.SetProtocol(apiv1.ProtocolTCP)
 

@@ -64,7 +64,7 @@ func Factorio(config *servconf.ServerConfig) *appsv1.Deployment {
 		},
 	}
 
-	config.SetPort(34197)
+	config.SetInternalPort(34197)
 	config.SetProtocol(apiv1.ProtocolUDP)
 
 	return deployment

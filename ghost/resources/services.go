@@ -55,7 +55,7 @@ func DeleteNodeport(config *servconf.ServerConfig) {
 	}
 }
 
-func GetExternalPort(config *servconf.ServerConfig) int32 {
+func GetExternalPort(config *servconf.ServerConfig) {
 	servicesClient := config.GetKubeConfig().CoreV1().Services(apiv1.NamespaceDefault)
 
 	fmt.Println("Getting NodePort...")
@@ -66,6 +66,5 @@ func GetExternalPort(config *servconf.ServerConfig) int32 {
 		fmt.Printf("Found NodePort %q.\n", config.Servername)
 	}
 	port := result.Spec.Ports[0].NodePort
-
-	return port
+	config.SetExternalPort(port)
 }
