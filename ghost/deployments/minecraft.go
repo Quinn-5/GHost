@@ -14,19 +14,19 @@ func Minecraft(config *servconf.ServerConfig) *appsv1.Deployment {
 			Replicas: int32Ptr(1),
 			Selector: &metav1.LabelSelector{
 				MatchLabels: map[string]string{
-					"app": config.Servername,
+					"app": config.GetServerName(),
 				},
 			},
 			Template: apiv1.PodTemplateSpec{
 				ObjectMeta: metav1.ObjectMeta{
 					Labels: map[string]string{
-						"app": config.Servername,
+						"app": config.GetServerName(),
 					},
 				},
 				Spec: apiv1.PodSpec{
 					Containers: []apiv1.Container{
 						{
-							Name: config.Servername,
+							Name: config.GetServerName(),
 							Env: []apiv1.EnvVar{
 								{
 									Name:  "EULA",
@@ -38,24 +38,24 @@ func Minecraft(config *servconf.ServerConfig) *appsv1.Deployment {
 							TTY:   true,
 							Resources: apiv1.ResourceRequirements{
 								Limits: apiv1.ResourceList{
-									apiv1.ResourceCPU:    config.CPU,
-									apiv1.ResourceMemory: config.RAM,
+									apiv1.ResourceCPU:    config.GetCPU(),
+									apiv1.ResourceMemory: config.GetRAM(),
 								},
 							},
 							VolumeMounts: []apiv1.VolumeMount{
 								{
 									MountPath: "/data",
-									Name:      config.Servername,
+									Name:      config.GetServerName(),
 								},
 							},
 						},
 					},
 					Volumes: []apiv1.Volume{
 						{
-							Name: config.Servername,
+							Name: config.GetServerName(),
 							VolumeSource: apiv1.VolumeSource{
 								PersistentVolumeClaim: &apiv1.PersistentVolumeClaimVolumeSource{
-									ClaimName: config.Servername,
+									ClaimName: config.GetServerName(),
 								},
 							},
 						},

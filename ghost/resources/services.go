@@ -14,18 +14,18 @@ func CreateNodeport(config *servconf.ServerConfig) {
 
 	nodeport := &apiv1.Service{
 		ObjectMeta: metav1.ObjectMeta{
-			Name: config.Servername,
+			Name: config.GetServerName(),
 			Labels: map[string]string{
-				"user": config.Username,
+				"user": config.GetUsername(),
 			},
 		},
 		Spec: apiv1.ServiceSpec{
 			Selector: map[string]string{
-				"app": config.Servername,
+				"app": config.GetServerName(),
 			},
 			Ports: []apiv1.ServicePort{
 				{
-					Port:     config.GetPort(),
+					Port:     config.GetInternalPort(),
 					Protocol: config.GetProtocol(),
 				},
 			},
@@ -47,11 +47,11 @@ func DeleteNodeport(config *servconf.ServerConfig) {
 	servicesClient := config.GetKubeConfig().CoreV1().Services(apiv1.NamespaceDefault)
 
 	fmt.Println("Deleting NodePort...")
-	err := servicesClient.Delete(context.TODO(), config.Servername, metav1.DeleteOptions{})
+	err := servicesClient.Delete(context.TODO(), config.GetServerName(), metav1.DeleteOptions{})
 	if err != nil {
 		panic(err)
 	} else {
-		fmt.Printf("Deleted NodePort %q.\n", config.Servername)
+		fmt.Printf("Deleted NodePort %q.\n", config.GetServerName())
 	}
 }
 
@@ -59,11 +59,11 @@ func GetExternalPort(config *servconf.ServerConfig) {
 	servicesClient := config.GetKubeConfig().CoreV1().Services(apiv1.NamespaceDefault)
 
 	fmt.Println("Getting NodePort...")
-	result, err := servicesClient.Get(context.TODO(), config.Servername, metav1.GetOptions{})
+	result, err := servicesClient.Get(context.TODO(), config.GetServerName(), metav1.GetOptions{})
 	if err != nil {
 		panic(err)
 	} else {
-		fmt.Printf("Found NodePort %q.\n", config.Servername)
+		fmt.Printf("Found NodePort %q.\n", config.GetServerName())
 	}
 	port := result.Spec.Ports[0].NodePort
 	config.SetExternalPort(port)

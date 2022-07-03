@@ -15,28 +15,28 @@ func EmptyDeployment(config *servconf.ServerConfig) *appsv1.Deployment {
 			Replicas: int32Ptr(1),
 			Selector: &metav1.LabelSelector{
 				MatchLabels: map[string]string{
-					"app": config.Servername,
+					"app": config.GetServerName(),
 				},
 			},
 			Template: apiv1.PodTemplateSpec{
 				ObjectMeta: metav1.ObjectMeta{
 					Labels: map[string]string{
-						"app": config.Servername,
+						"app": config.GetServerName(),
 					},
 				},
 				// Pod spec should be the only thing that needs to change between deployments
 				Spec: apiv1.PodSpec{
 					Containers: []apiv1.Container{
 						{
-							Name: config.Servername,
+							Name: config.GetServerName(),
 
 							// The container image for this game server
 							Image: "nginx",
 
 							Resources: apiv1.ResourceRequirements{
 								Limits: apiv1.ResourceList{
-									apiv1.ResourceCPU:    config.CPU,
-									apiv1.ResourceMemory: config.RAM,
+									apiv1.ResourceCPU:    config.GetCPU(),
+									apiv1.ResourceMemory: config.GetRAM(),
 								},
 							},
 
@@ -44,7 +44,7 @@ func EmptyDeployment(config *servconf.ServerConfig) *appsv1.Deployment {
 								{
 									// Container's internal mount point for persistent data
 									MountPath: "/app/config",
-									Name:      config.Servername,
+									Name:      config.GetServerName(),
 								},
 							},
 						},
@@ -53,10 +53,10 @@ func EmptyDeployment(config *servconf.ServerConfig) *appsv1.Deployment {
 					// Only necessary if you need persistent storage, but you probably do
 					Volumes: []apiv1.Volume{
 						{
-							Name: config.Servername,
+							Name: config.GetServerName(),
 							VolumeSource: apiv1.VolumeSource{
 								PersistentVolumeClaim: &apiv1.PersistentVolumeClaimVolumeSource{
-									ClaimName: config.Servername,
+									ClaimName: config.GetServerName(),
 								},
 							},
 						},

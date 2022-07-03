@@ -15,23 +15,23 @@ func Terraria(config *servconf.ServerConfig) *appsv1.Deployment {
 			Replicas: int32Ptr(1),
 			Selector: &metav1.LabelSelector{
 				MatchLabels: map[string]string{
-					"app": config.Servername,
+					"app": config.GetServerName(),
 				},
 			},
 			Template: apiv1.PodTemplateSpec{
 				ObjectMeta: metav1.ObjectMeta{
 					Labels: map[string]string{
-						"app": config.Servername,
+						"app": config.GetServerName(),
 					},
 				},
 				Spec: apiv1.PodSpec{
 					Containers: []apiv1.Container{
 						{
-							Name:  config.Servername,
+							Name:  config.GetServerName(),
 							Image: "ryshe/terraria",
 							Args: []string{
 								"-world",
-								"/root/.local/share/Terraria/Worlds/" + config.Servername + ".wld",
+								"/root/.local/share/Terraria/Worlds/" + config.GetServerName() + ".wld",
 								"-autocreate",
 								"2",
 							},
@@ -39,25 +39,25 @@ func Terraria(config *servconf.ServerConfig) *appsv1.Deployment {
 							TTY:   true,
 							Resources: apiv1.ResourceRequirements{
 								Limits: apiv1.ResourceList{
-									apiv1.ResourceCPU:    config.CPU,
-									apiv1.ResourceMemory: config.RAM,
+									apiv1.ResourceCPU:    config.GetCPU(),
+									apiv1.ResourceMemory: config.GetRAM(),
 								},
 							},
 
 							VolumeMounts: []apiv1.VolumeMount{
 								{
 									MountPath: "/root/.local/share/Terraria/Worlds",
-									Name:      config.Servername,
+									Name:      config.GetServerName(),
 								},
 							},
 						},
 					},
 					Volumes: []apiv1.Volume{
 						{
-							Name: config.Servername,
+							Name: config.GetServerName(),
 							VolumeSource: apiv1.VolumeSource{
 								PersistentVolumeClaim: &apiv1.PersistentVolumeClaimVolumeSource{
-									ClaimName: config.Servername,
+									ClaimName: config.GetServerName(),
 								},
 							},
 						},

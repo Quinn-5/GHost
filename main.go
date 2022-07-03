@@ -7,7 +7,6 @@ import (
 	"github.com/Quinn-5/GHost/ghost/servconf"
 	"github.com/gin-contrib/multitemplate"
 	"github.com/gin-gonic/gin"
-	"k8s.io/apimachinery/pkg/api/resource"
 )
 
 func createRenderer() multitemplate.Renderer {
@@ -25,27 +24,15 @@ func createHandler() gin.HandlerFunc {
 		username := ctx.PostForm("username")
 		servername := ctx.PostForm("servername")
 		servertype := ctx.PostForm("servertype")
-		var cpu resource.Quantity
-		if n, err := resource.ParseQuantity(ctx.PostForm("cpu")); err == nil {
-			cpu = n
-		}
-		var ram resource.Quantity
-		if n, err := resource.ParseQuantity(ctx.PostForm("ram") + "Gi"); err == nil {
-			ram = n
-		}
-		var disk resource.Quantity
-		if n, err := resource.ParseQuantity(ctx.PostForm("disk") + "Gi"); err == nil {
-			disk = n
-		}
+		cpu := ctx.PostForm("cpu")
+		ram := ctx.PostForm("ram")
+		disk := ctx.PostForm("disk")
 
-		conf := &servconf.ServerConfig{
-			Username:   username,
-			Servername: servername,
-			Type:       servertype,
-			CPU:        cpu,
-			RAM:        ram,
-			Disk:       disk,
-		}
+		conf := servconf.New(username, servername)
+		conf.SetType(servertype)
+		conf.SetCPU(cpu)
+		conf.SetRAM(ram)
+		conf.SetDisk(disk)
 
 		err := ghost.Create(conf)
 		if err != nil {
@@ -53,8 +40,8 @@ func createHandler() gin.HandlerFunc {
 			return
 		}
 
-		ctx.SetCookie("username", conf.Username, 30, "/", "localhost", false, true)
-		ctx.SetCookie("servername", conf.Servername, 30, "/", "localhost", false, true)
+		ctx.SetCookie("username", conf.GetUsername(), 30, "/", "localhost", false, true)
+		ctx.SetCookie("servername", conf.GetServerName(), 30, "/", "localhost", false, true)
 
 		ctx.Redirect(http.StatusFound, "/success")
 	}
@@ -71,14 +58,14 @@ func resultHandler() gin.HandlerFunc {
 			servername = cookie
 		}
 
-		conf := &servconf.ServerConfig{
-			Username:   username,
-			Servername: servername,
-		}
+		conf := servconf.New(username, servername)
 
 		ghost.GetAddress(conf)
 
-		ctx.HTML(http.StatusOK, "result", conf)
+		ctx.HTML(http.StatusOK, "result", gin.H{
+			"IP":   conf.GetIP(),
+			"Port": conf.GetExternalPort(),
+		})
 	}
 }
 
@@ -99,6 +86,8 @@ func main() {
 	router.POST("/create", createHandler())
 
 	router.GET("/success", resultHandler())
+
+	router.GET("/console", func(c *gin.Context) {})
 
 	router.Run(":8000")
 }

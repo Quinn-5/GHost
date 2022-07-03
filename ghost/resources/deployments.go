@@ -25,11 +25,11 @@ func DeleteDeployment(config *servconf.ServerConfig) {
 	deploymentClient := config.GetKubeConfig().AppsV1().Deployments(apiv1.NamespaceDefault)
 
 	fmt.Println("Deleting Deployment...")
-	err := deploymentClient.Delete(context.TODO(), config.Servername, metav1.DeleteOptions{})
+	err := deploymentClient.Delete(context.TODO(), config.GetServerName(), metav1.DeleteOptions{})
 	if err != nil {
 		panic(err)
 	} else {
-		fmt.Printf("Deleted Deployment %q.\n", config.Servername)
+		fmt.Printf("Deleted Deployment %q.\n", config.GetServerName())
 	}
 }
 
@@ -37,21 +37,22 @@ func GetAllDeploymentsForUser(config *servconf.ServerConfig) []*servconf.ServerC
 	deploymentClient := config.GetKubeConfig().AppsV1().Deployments(apiv1.NamespaceDefault)
 
 	fmt.Println("Getting Deployments...")
-	deploymentList, err := deploymentClient.List(context.TODO(), metav1.ListOptions{LabelSelector: "user=" + config.Username})
+	deploymentList, err := deploymentClient.List(context.TODO(), metav1.ListOptions{LabelSelector: "user=" + config.GetUsername()})
 	if err != nil {
 		panic(err)
 	} else {
-		fmt.Printf("Found %d Deployments for %q.\n", len(deploymentList.Items), config.Username)
+		fmt.Printf("Found %d Deployments for %q.\n", len(deploymentList.Items), config.GetUsername())
 	}
 
 	var deployments []*servconf.ServerConfig
 
 	for _, element := range deploymentList.Items {
-		deployments = append(deployments, &servconf.ServerConfig{
-			Username:   element.ObjectMeta.Labels["user"],
-			Servername: element.Name,
-			Type:       element.ObjectMeta.Labels["type"],
-		})
+		username := element.ObjectMeta.Labels["user"]
+		servername := element.Name
+		serverType := element.ObjectMeta.Labels["type"]
+		conf := servconf.New(username, servername)
+		conf.SetType(serverType)
+		deployments = append(deployments, conf)
 	}
 
 	return deployments

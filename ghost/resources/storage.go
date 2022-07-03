@@ -20,9 +20,9 @@ func CreatePersistentVolumeClaim(config *servconf.ServerConfig) {
 
 	pvc := &apiv1.PersistentVolumeClaim{
 		ObjectMeta: metav1.ObjectMeta{
-			Name: config.Servername,
+			Name: config.GetServerName(),
 			Labels: map[string]string{
-				"user": config.Username,
+				"user": config.GetUsername(),
 			},
 		},
 		Spec: apiv1.PersistentVolumeClaimSpec{
@@ -31,7 +31,7 @@ func CreatePersistentVolumeClaim(config *servconf.ServerConfig) {
 			},
 			Resources: apiv1.ResourceRequirements{
 				Requests: apiv1.ResourceList{
-					"storage": config.Disk,
+					"storage": config.GetDisk(),
 				},
 			},
 			StorageClassName: &storageClass,
@@ -52,10 +52,10 @@ func DeletePersistentVolumeClaim(config *servconf.ServerConfig) {
 	storageClient := config.GetKubeConfig().CoreV1().PersistentVolumeClaims(apiv1.NamespaceDefault)
 
 	fmt.Println("Deleting PersistentVolumeClaim...")
-	err := storageClient.Delete(context.TODO(), config.Servername, metav1.DeleteOptions{})
+	err := storageClient.Delete(context.TODO(), config.GetServerName(), metav1.DeleteOptions{})
 	if err != nil {
 		panic(err)
 	} else {
-		fmt.Printf("Deleted PersistentVolumeClaim %q.\n", config.Servername)
+		fmt.Printf("Deleted PersistentVolumeClaim %q.\n", config.GetServerName())
 	}
 }

@@ -9,10 +9,10 @@ func int32Ptr(i int32) *int32 { return &i }
 
 func stdMeta(config *servconf.ServerConfig) metav1.ObjectMeta {
 	return metav1.ObjectMeta{
-		Name: config.Servername,
+		Name: config.GetServerName(),
 		Labels: map[string]string{
-			"user": config.Username,
-			"type": config.Type,
+			"user": config.GetUsername(),
+			"type": config.GetType(),
 		},
 	}
 }

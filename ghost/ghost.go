@@ -33,12 +33,9 @@ import (
 )
 
 func Create(config *servconf.ServerConfig) error {
-	// This is probably BAD!!! but I'll fix it whenever I figure out best practices
-	config.Init()
-
 	var deployment *v1.Deployment
 
-	switch config.Type {
+	switch config.GetType() {
 	case "factorio":
 		deployment = deployments.Factorio(config)
 	case "minecraft":
@@ -57,8 +54,6 @@ func Create(config *servconf.ServerConfig) error {
 }
 
 func Delete(config *servconf.ServerConfig) error {
-	config.Init()
-
 	resources.DeleteNodeport(config)
 	resources.DeletePersistentVolumeClaim(config)
 	resources.DeleteDeployment(config)
@@ -67,7 +62,6 @@ func Delete(config *servconf.ServerConfig) error {
 }
 
 func GetAddress(config *servconf.ServerConfig) {
-	config.Init()
 	resources.GetNodeIP(config)
 	resources.GetExternalPort(config)
 }

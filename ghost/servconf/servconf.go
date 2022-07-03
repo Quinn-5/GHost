@@ -14,34 +14,36 @@ import (
 
 var kubeconfig *string
 
+// ServerConfig for use in backend
+// Initialize with New()
 type ServerConfig struct {
 
 	// Name of user requesting server
-	Username string
+	username string
 
 	// Name of new server
-	Servername string
+	serverName string
 
 	// Type of server requested
-	Type string
+	serverType string
 
 	// Number of CPU cores to assign
-	CPU resource.Quantity
+	cpu resource.Quantity
 
 	// Number of GiB RAM to reserve
-	RAM resource.Quantity
+	ram resource.Quantity
 
 	// Number of MiB disk space to reserve
-	Disk resource.Quantity
+	disk resource.Quantity
 
 	// IP address to connect to
-	IP string
+	ip string
 
 	// Internal port to be exposed
 	internalPort int32
 
 	// External port to connect
-	ExternalPort int32
+	externalPort int32
 
 	// Protocol used for communication
 	protocol apiv1.Protocol
@@ -50,8 +52,9 @@ type ServerConfig struct {
 	clientset *kubernetes.Clientset
 }
 
-// Generates config and cleans inputs
-func (cfg *ServerConfig) Init() error {
+func New(username string, serverName string) *ServerConfig {
+	cfg := &ServerConfig{}
+
 	if kubeconfig == nil {
 		if home := homedir.HomeDir(); home != "" {
 			kubeconfig = flag.String("kubeconfig", filepath.Join(home, ".kube", "config"), "(optional) absolute path to the kubeconfig file")
@@ -60,40 +63,59 @@ func (cfg *ServerConfig) Init() error {
 		}
 		flag.Parse()
 	}
-
 	config, err := clientcmd.BuildConfigFromFlags("", *kubeconfig)
 	if err != nil {
-		return err
+		panic(err)
 	}
 	cfg.clientset, err = kubernetes.NewForConfig(config)
 	if err != nil {
-		return err
+		panic(err)
 	}
 
-	cfg.Username = strings.ToLower(cfg.Username)
-	cfg.Servername = strings.ToLower(cfg.Servername)
-	cfg.Type = strings.ToLower(cfg.Type)
-	return nil
+	cfg.username = strings.ToLower(username)
+	cfg.serverName = strings.ToLower(serverName)
+
+	return cfg
 }
 
-func (cfg *ServerConfig) GetKubeConfig() *kubernetes.Clientset {
-	return cfg.clientset
+func (cfg *ServerConfig) GetUsername() string {
+	return cfg.username
 }
 
-func (cfg *ServerConfig) GetPort() int32 {
+func (cfg *ServerConfig) GetServerName() string {
+	return cfg.serverName
+}
+
+func (cfg *ServerConfig) GetType() string {
+	return cfg.serverType
+}
+
+func (cfg *ServerConfig) SetType(servertype string) {
+	cfg.serverType = strings.ToLower(servertype)
+}
+
+func (cfg *ServerConfig) GetInternalPort() int32 {
 	return cfg.internalPort
-}
-
-func (cfg *ServerConfig) SetIP(IP string) {
-	cfg.IP = IP
 }
 
 func (cfg *ServerConfig) SetInternalPort(port int32) {
 	cfg.internalPort = port
 }
 
+func (cfg *ServerConfig) GetExternalPort() int32 {
+	return cfg.externalPort
+}
+
 func (cfg *ServerConfig) SetExternalPort(port int32) {
-	cfg.ExternalPort = port
+	cfg.externalPort = port
+}
+
+func (cfg *ServerConfig) GetIP() string {
+	return cfg.ip
+}
+
+func (cfg *ServerConfig) SetIP(ip string) {
+	cfg.ip = ip
 }
 
 func (cfg *ServerConfig) GetProtocol() apiv1.Protocol {
@@ -102,4 +124,38 @@ func (cfg *ServerConfig) GetProtocol() apiv1.Protocol {
 
 func (cfg *ServerConfig) SetProtocol(protocol apiv1.Protocol) {
 	cfg.protocol = protocol
+}
+
+func (cfg *ServerConfig) GetCPU() resource.Quantity {
+	return cfg.cpu
+}
+
+func (cfg *ServerConfig) SetCPU(cpu string) {
+	if n, err := resource.ParseQuantity(cpu); err == nil {
+		cfg.cpu = n
+	}
+}
+
+func (cfg *ServerConfig) GetRAM() resource.Quantity {
+	return cfg.ram
+}
+
+func (cfg *ServerConfig) SetRAM(ram string) {
+	if n, err := resource.ParseQuantity(ram + "Gi"); err == nil {
+		cfg.ram = n
+	}
+}
+
+func (cfg *ServerConfig) GetDisk() resource.Quantity {
+	return cfg.disk
+}
+
+func (cfg *ServerConfig) SetDisk(disk string) {
+	if n, err := resource.ParseQuantity(disk + "Gi"); err == nil {
+		cfg.disk = n
+	}
+}
+
+func (cfg *ServerConfig) GetKubeConfig() *kubernetes.Clientset {
+	return cfg.clientset
 }

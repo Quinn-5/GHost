@@ -13,11 +13,11 @@ func GetPod(config *servconf.ServerConfig) *apiv1.Pod {
 	podsClient := config.GetKubeConfig().CoreV1().Pods(apiv1.NamespaceDefault)
 
 	fmt.Println("Getting Pod...")
-	pod, err := podsClient.Get(context.TODO(), config.Servername, metav1.GetOptions{})
+	pod, err := podsClient.Get(context.TODO(), config.GetServerName(), metav1.GetOptions{})
 	if err != nil {
 		panic(err)
 	} else {
-		fmt.Printf("Found Pod %q.\n", config.Servername)
+		fmt.Printf("Found Pod %q.\n", config.GetServerName())
 	}
 
 	return pod
