@@ -10,12 +10,7 @@ import (
 // An empty example of a functional deployment. For use in testing or creating new deployments
 func EmptyDeployment(config *servconf.ServerConfig) *appsv1.Deployment {
 	deployment := &appsv1.Deployment{
-		ObjectMeta: metav1.ObjectMeta{
-			Name: config.Servername,
-			Labels: map[string]string{
-				"user": config.Username,
-			},
-		},
+		ObjectMeta: stdMeta(config),
 		Spec: appsv1.DeploymentSpec{
 			Replicas: int32Ptr(1),
 			Selector: &metav1.LabelSelector{
