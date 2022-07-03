@@ -32,3 +32,27 @@ func DeleteDeployment(config *servconf.ServerConfig) {
 		fmt.Printf("Deleted Deployment %q.\n", config.Servername)
 	}
 }
+
+func GetAllDeploymentsForUser(config *servconf.ServerConfig) []*servconf.ServerConfig {
+	deploymentClient := config.GetKubeConfig().AppsV1().Deployments(apiv1.NamespaceDefault)
+
+	fmt.Println("Getting Deployments...")
+	deploymentList, err := deploymentClient.List(context.TODO(), metav1.ListOptions{LabelSelector: "user=" + config.Username})
+	if err != nil {
+		panic(err)
+	} else {
+		fmt.Printf("Found %d Deployments for %q.\n", len(deploymentList.Items), config.Username)
+	}
+
+	var deployments []*servconf.ServerConfig
+
+	for _, element := range deploymentList.Items {
+		deployments = append(deployments, &servconf.ServerConfig{
+			Username:   element.ObjectMeta.Labels["user"],
+			Servername: element.Name,
+			Type:       element.ObjectMeta.Labels["type"],
+		})
+	}
+
+	return deployments
+}
