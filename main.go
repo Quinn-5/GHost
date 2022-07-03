@@ -1,14 +1,24 @@
 package main
 
 import (
-	"html/template"
 	"net/http"
 
 	"github.com/Quinn-5/GHost/ghost"
 	"github.com/Quinn-5/GHost/ghost/servconf"
+	"github.com/gin-contrib/multitemplate"
 	"github.com/gin-gonic/gin"
 	"k8s.io/apimachinery/pkg/api/resource"
 )
+
+func createRenderer() multitemplate.Renderer {
+	r := multitemplate.NewRenderer()
+	r.AddFromFiles("index", "templates/base.html", "templates/index.html")
+	r.AddFromFiles("console", "templates/base.html", "templates/console.html")
+	r.AddFromFiles("create", "templates/base.html", "templates/create.html")
+	r.AddFromFiles("login", "templates/base.html", "templates/login.html")
+	r.AddFromFiles("result", "templates/base.html", "templates/result.html")
+	return r
+}
 
 func createHandler() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
@@ -46,7 +56,7 @@ func createHandler() gin.HandlerFunc {
 		ctx.SetCookie("username", conf.Username, 30, "/", "localhost", false, true)
 		ctx.SetCookie("servername", conf.Servername, 30, "/", "localhost", false, true)
 
-		ctx.Redirect(http.StatusFound, "/success/")
+		ctx.Redirect(http.StatusFound, "/success")
 	}
 }
 
@@ -69,40 +79,29 @@ func resultHandler() gin.HandlerFunc {
 		}
 
 		ghost.GetAddress(conf)
+		println(conf.IP, conf.ExternalPort)
 
-		ctx.HTML(http.StatusOK, "result.html", conf)
+		ctx.HTML(http.StatusOK, "result", conf)
 	}
 }
 
-func consoleHandler(w http.ResponseWriter, r *http.Request) {
-	t, _ := template.ParseFiles("tmpl/console.html")
-	t.Execute(w, nil)
-}
-
-func loginHandler(w http.ResponseWriter, r *http.Request) {
-	t, _ := template.ParseFiles("tmpl/login.html")
-	t.Execute(w, nil)
-}
-
 func main() {
+	router := gin.Default()
+	router.Static("/static", "./static")
+	router.StaticFile("/favicon.ico", "./resources/favicon.ico")
+	router.HTMLRender = createRenderer()
 
-	route := gin.Default()
-	route.Static("/static", "./static")
-	route.StaticFile("/favicon.ico", "./resources/favicon.ico")
-	route.StaticFile("/navbar.html", "./tmpl/navbar.html")
-	route.LoadHTMLGlob("tmpl/*")
-
-	route.GET("/", func(c *gin.Context) {
-		c.HTML(http.StatusOK, "index.html", gin.H{})
+	router.GET("/", func(c *gin.Context) {
+		c.HTML(http.StatusOK, "index", gin.H{})
 	})
 
-	route.GET("/create", func(c *gin.Context) {
-		c.HTML(http.StatusOK, "create.html", gin.H{})
+	router.GET("/create", func(c *gin.Context) {
+		c.HTML(http.StatusOK, "create", gin.H{})
 	})
 
-	route.POST("/create", createHandler())
+	router.POST("/create", createHandler())
 
-	route.GET("/success", resultHandler())
+	router.GET("/success", resultHandler())
 
-	route.Run(":8000")
+	router.Run(":8000")
 }
