@@ -3,6 +3,7 @@ module github.com/Quinn-5/GHost
 go 1.18
 
 require (
+	github.com/gin-contrib/multitemplate v0.0.0-20220628024418-96d92b5f2a6d
 	github.com/gin-gonic/gin v1.8.1
 	k8s.io/api v0.24.2
 	k8s.io/apimachinery v0.24.2
@@ -12,7 +13,6 @@ require (
 require (
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/emicklei/go-restful/v3 v3.8.0 // indirect
-	github.com/gin-contrib/multitemplate v0.0.0-20220628024418-96d92b5f2a6d // indirect
 	github.com/gin-contrib/sse v0.1.0 // indirect
 	github.com/go-logr/logr v1.2.3 // indirect
 	github.com/go-openapi/jsonpointer v0.19.5 // indirect
@@ -39,7 +39,6 @@ require (
 	github.com/pelletier/go-toml/v2 v2.0.2 // indirect
 	github.com/rogpeppe/go-internal v1.8.1 // indirect
 	github.com/spf13/pflag v1.0.5 // indirect
-	github.com/stretchr/testify v1.7.5 // indirect
 	github.com/ugorji/go/codec v1.2.7 // indirect
 	golang.org/x/crypto v0.0.0-20220525230936-793ad666bf5e // indirect
 	golang.org/x/net v0.0.0-20220621193019-9d032be2e588 // indirect
