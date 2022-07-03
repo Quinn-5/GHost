@@ -1,3 +1,11 @@
 {{define "content"}}
-
+<div class="container mt-3">
+    <h1 class="text-center">Manage Servers</h1>
+    {{range .Servers}}
+    <div class="row">
+           <p>{{.Servername}}: {{.Type}}</p> 
+    </div>
+    {{end}}
+    
+</div>
 {{end}}
