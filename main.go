@@ -10,56 +10,68 @@ import (
 	"k8s.io/apimachinery/pkg/api/resource"
 )
 
-func indexHandler(w http.ResponseWriter, r *http.Request) {
-	t, _ := template.ParseFiles("tmpl/index.html")
-	t.Execute(w, nil)
+func createHandler() gin.HandlerFunc {
+	return func(ctx *gin.Context) {
+		username := ctx.PostForm("username")
+		servername := ctx.PostForm("servername")
+		servertype := ctx.PostForm("servertype")
+		var cpu resource.Quantity
+		if n, err := resource.ParseQuantity(ctx.PostForm("cpu")); err == nil {
+			cpu = n
+		}
+		var ram resource.Quantity
+		if n, err := resource.ParseQuantity(ctx.PostForm("ram") + "Gi"); err == nil {
+			ram = n
+		}
+		var disk resource.Quantity
+		if n, err := resource.ParseQuantity(ctx.PostForm("disk") + "Gi"); err == nil {
+			disk = n
+		}
+
+		conf := &servconf.ServerConfig{
+			Username:   username,
+			Servername: servername,
+			Type:       servertype,
+			CPU:        cpu,
+			RAM:        ram,
+			Disk:       disk,
+		}
+
+		err := ghost.Create(conf)
+		if err != nil {
+			ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+			return
+		}
+
+		ctx.SetCookie("username", conf.Username, 30, "/", "localhost", false, true)
+		ctx.SetCookie("servername", conf.Servername, 30, "/", "localhost", false, true)
+
+		ctx.Redirect(http.StatusFound, "/success/")
+	}
 }
 
-func createHandler(w http.ResponseWriter, r *http.Request) {
-	t, _ := template.ParseFiles("tmpl/create.html")
+func resultHandler() gin.HandlerFunc {
+	return func(ctx *gin.Context) {
+		var username string
+		if cookie, err := ctx.Cookie("username"); err == nil {
+			println(cookie)
+			username = cookie
+		}
+		var servername string
+		if cookie, err := ctx.Cookie("servername"); err == nil {
+			println(cookie)
+			servername = cookie
+		}
 
-	if r.Method != http.MethodPost {
-		t.Execute(w, nil)
-		return
-	}
+		conf := &servconf.ServerConfig{
+			Username:   username,
+			Servername: servername,
+		}
 
-	username := r.FormValue("username")
-	servername := r.FormValue("servername")
-	servertype := r.FormValue("servertype")
-	var cpu resource.Quantity
-	if n, err := resource.ParseQuantity(r.FormValue("cpu")); err == nil {
-		cpu = n
-	}
-	var ram resource.Quantity
-	if n, err := resource.ParseQuantity(r.FormValue("ram") + "Gi"); err == nil {
-		ram = n
-	}
-	var disk resource.Quantity
-	if n, err := resource.ParseQuantity(r.FormValue("disk") + "Gi"); err == nil {
-		disk = n
-	}
+		ghost.GetAddress(conf)
 
-	p := &servconf.ServerConfig{
-		Username:   username,
-		Servername: servername,
-		Type:       servertype,
-		CPU:        cpu,
-		RAM:        ram,
-		Disk:       disk,
+		ctx.HTML(http.StatusOK, "result.html", conf)
 	}
-
-	err := ghost.Create(p)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-
-	http.Redirect(w, r, "/result/", http.StatusFound)
-}
-
-func resultHandler(w http.ResponseWriter, r *http.Request) {
-	t, _ := template.ParseFiles("tmpl/result.html")
-	t.Execute(w, nil)
 }
 
 func consoleHandler(w http.ResponseWriter, r *http.Request) {
@@ -73,16 +85,24 @@ func loginHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
-	mux := http.NewServeMux()
-	mux.HandleFunc("/", indexHandler)
-	mux.HandleFunc("/create/", createHandler)
-	mux.HandleFunc("/console/", consoleHandler)
-	mux.HandleFunc("/login/", loginHandler)
-	mux.HandleFunc("/result/", resultHandler)
 
-	fs := http.FileServer(http.Dir("static/"))
-	mux.Handle("/static/", http.StripPrefix("/static/", fs))
-	mux.Handle("/tmpl/", http.StripPrefix("/tmpl/", http.FileServer(http.Dir("tmpl"))))
+	route := gin.Default()
+	route.Static("/static", "./static")
+	route.StaticFile("/favicon.ico", "./resources/favicon.ico")
+	route.StaticFile("/navbar.html", "./tmpl/navbar.html")
+	route.LoadHTMLGlob("tmpl/*")
 
-	http.ListenAndServe(":8000", mux)
+	route.GET("/", func(c *gin.Context) {
+		c.HTML(http.StatusOK, "index.html", gin.H{})
+	})
+
+	route.GET("/create", func(c *gin.Context) {
+		c.HTML(http.StatusOK, "create.html", gin.H{})
+	})
+
+	route.POST("/create", createHandler())
+
+	route.GET("/success", resultHandler())
+
+	route.Run(":8000")
 }

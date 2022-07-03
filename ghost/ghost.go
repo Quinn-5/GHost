@@ -68,5 +68,6 @@ func Delete(config *servconf.ServerConfig) error {
 
 func GetAddress(config *servconf.ServerConfig) {
 	config.Init()
+	resources.GetNodeIP(config)
 	resources.GetExternalPort(config)
 }

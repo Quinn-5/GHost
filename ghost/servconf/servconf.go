@@ -12,6 +12,8 @@ import (
 	"k8s.io/client-go/util/homedir"
 )
 
+var kubeconfig *string
+
 type ServerConfig struct {
 
 	// Name of user requesting server
@@ -32,42 +34,38 @@ type ServerConfig struct {
 	// Number of MiB disk space to reserve
 	Disk resource.Quantity
 
+	// IP address to connect to
+	IP string
+
 	// Internal port to be exposed
 	internalPort int32
 
 	// External port to connect
-	externalPort int32
+	ExternalPort int32
 
 	// Protocol used for communication
 	protocol apiv1.Protocol
 
 	// kubeconfig
-	kubeconfig *kubernetes.Clientset
-}
-
-type Address struct {
-	// IP used to access server
-	IP string
-
-	// External connection port
-	Port int32
+	clientset *kubernetes.Clientset
 }
 
 // Generates config and cleans inputs
 func (cfg *ServerConfig) Init() error {
-	var kubeconfig *string
-	if home := homedir.HomeDir(); home != "" {
-		kubeconfig = flag.String("kubeconfig", filepath.Join(home, ".kube", "config"), "(optional) absolute path to the kubeconfig file")
-	} else {
-		kubeconfig = flag.String("kubeconfig", "", "absolute path to the kubeconfig file")
+	if kubeconfig == nil {
+		if home := homedir.HomeDir(); home != "" {
+			kubeconfig = flag.String("kubeconfig", filepath.Join(home, ".kube", "config"), "(optional) absolute path to the kubeconfig file")
+		} else {
+			kubeconfig = flag.String("kubeconfig", "", "absolute path to the kubeconfig file")
+		}
+		flag.Parse()
 	}
-	flag.Parse()
 
 	config, err := clientcmd.BuildConfigFromFlags("", *kubeconfig)
 	if err != nil {
 		return err
 	}
-	cfg.kubeconfig, err = kubernetes.NewForConfig(config)
+	cfg.clientset, err = kubernetes.NewForConfig(config)
 	if err != nil {
 		return err
 	}
@@ -79,11 +77,15 @@ func (cfg *ServerConfig) Init() error {
 }
 
 func (cfg *ServerConfig) GetKubeConfig() *kubernetes.Clientset {
-	return cfg.kubeconfig
+	return cfg.clientset
 }
 
 func (cfg *ServerConfig) GetPort() int32 {
 	return cfg.internalPort
+}
+
+func (cfg *ServerConfig) SetIP(IP string) {
+	cfg.IP = IP
 }
 
 func (cfg *ServerConfig) SetInternalPort(port int32) {
@@ -91,7 +93,7 @@ func (cfg *ServerConfig) SetInternalPort(port int32) {
 }
 
 func (cfg *ServerConfig) SetExternalPort(port int32) {
-	cfg.externalPort = port
+	cfg.ExternalPort = port
 }
 
 func (cfg *ServerConfig) GetProtocol() apiv1.Protocol {
