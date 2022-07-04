@@ -95,7 +95,16 @@ func main() {
 	router.GET("/success", resultHandler())
 
 	router.GET("/console", func(c *gin.Context) {
-		c.HTML(http.StatusOK, "create", gin.H{})
+		var username string
+		if cookie, err := c.Cookie("username"); err != nil {
+			c.Redirect(http.StatusFound, "/login")
+		} else {
+			username = cookie
+		}
+		deployments := ghost.GetAllDeploymentsForUser(servconf.New(username, ""))
+		c.HTML(http.StatusOK, "console", gin.H{
+			"Servers": deployments,
+		})
 	})
 
 	router.GET("/login", func(c *gin.Context) {

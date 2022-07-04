@@ -52,6 +52,18 @@ type ServerConfig struct {
 	clientset *kubernetes.Clientset
 }
 
+type PubServConf struct {
+	Username     string
+	ServerName   string
+	ServerType   string
+	CPU          string
+	RAM          string
+	Disk         string
+	IP           string
+	InternalPort int32
+	ExternalPort int32
+}
+
 func New(username string, serverName string) *ServerConfig {
 	cfg := &ServerConfig{}
 
@@ -86,7 +98,7 @@ func (cfg *ServerConfig) GetServerName() string {
 	return cfg.serverName
 }
 
-func (cfg *ServerConfig) GetType() string {
+func (cfg *ServerConfig) GetServerType() string {
 	return cfg.serverType
 }
 
@@ -158,4 +170,19 @@ func (cfg *ServerConfig) SetDisk(disk string) {
 
 func (cfg *ServerConfig) GetKubeConfig() *kubernetes.Clientset {
 	return cfg.clientset
+}
+
+func (cfg *ServerConfig) PubConf() *PubServConf {
+	pconf := &PubServConf{
+		Username:     cfg.GetUsername(),
+		ServerName:   cfg.GetServerName(),
+		ServerType:   cfg.GetServerType(),
+		CPU:          cfg.GetCPU().OpenAPISchemaFormat(),
+		RAM:          cfg.GetRAM().OpenAPISchemaFormat(),
+		Disk:         cfg.GetRAM().OpenAPISchemaFormat(),
+		IP:           cfg.GetIP(),
+		InternalPort: cfg.GetInternalPort(),
+		ExternalPort: cfg.GetExternalPort(),
+	}
+	return pconf
 }

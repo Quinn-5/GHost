@@ -12,7 +12,7 @@ func stdMeta(config *servconf.ServerConfig) metav1.ObjectMeta {
 		Name: config.GetServerName(),
 		Labels: map[string]string{
 			"user": config.GetUsername(),
-			"type": config.GetType(),
+			"type": config.GetServerType(),
 		},
 	}
 }

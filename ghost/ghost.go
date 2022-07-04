@@ -35,7 +35,7 @@ import (
 func Create(config *servconf.ServerConfig) error {
 	var deployment *v1.Deployment
 
-	switch config.GetType() {
+	switch config.GetServerType() {
 	case "factorio":
 		deployment = deployments.Factorio(config)
 	case "minecraft":
@@ -64,4 +64,13 @@ func Delete(config *servconf.ServerConfig) error {
 func GetAddress(config *servconf.ServerConfig) {
 	resources.GetNodeIP(config)
 	resources.GetExternalPort(config)
+}
+
+func GetAllDeploymentsForUser(config *servconf.ServerConfig) []*servconf.PubServConf {
+	servconfs := resources.GetAllDeploymentsForUser(config)
+	var deployments []*servconf.PubServConf
+	for _, element := range servconfs {
+		deployments = append(deployments, element.PubConf())
+	}
+	return deployments
 }

@@ -50,6 +50,7 @@ func GetAllDeploymentsForUser(config *servconf.ServerConfig) []*servconf.ServerC
 		username := element.ObjectMeta.Labels["user"]
 		servername := element.Name
 		serverType := element.ObjectMeta.Labels["type"]
+
 		conf := servconf.New(username, servername)
 		conf.SetType(serverType)
 		deployments = append(deployments, conf)
