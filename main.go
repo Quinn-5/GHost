@@ -21,7 +21,12 @@ func createRenderer() multitemplate.Renderer {
 
 func createHandler() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-		username := ctx.PostForm("username")
+		var username string
+		if cookie, err := ctx.Cookie("username"); err == nil {
+			username = cookie
+		} else {
+			ctx.Redirect(http.StatusFound, "/login")
+		}
 		servername := ctx.PostForm("servername")
 		servertype := ctx.PostForm("servertype")
 		cpu := ctx.PostForm("cpu")
@@ -40,7 +45,6 @@ func createHandler() gin.HandlerFunc {
 			return
 		}
 
-		ctx.SetCookie("username", conf.GetUsername(), 30, "/", "localhost", false, true)
 		ctx.SetCookie("servername", conf.GetServerName(), 30, "/", "localhost", false, true)
 
 		ctx.Redirect(http.StatusFound, "/success")
@@ -80,6 +84,9 @@ func main() {
 	})
 
 	router.GET("/create", func(c *gin.Context) {
+		if _, err := c.Cookie("username"); err != nil {
+			c.Redirect(http.StatusFound, "/login")
+		}
 		c.HTML(http.StatusOK, "create", gin.H{})
 	})
 
@@ -87,7 +94,17 @@ func main() {
 
 	router.GET("/success", resultHandler())
 
-	router.GET("/console", func(c *gin.Context) {})
+	router.GET("/console", func(c *gin.Context) {
+		c.HTML(http.StatusOK, "create", gin.H{})
+	})
+
+	router.GET("/login", func(c *gin.Context) {
+		c.HTML(http.StatusOK, "login", gin.H{})
+	})
+	router.POST("/login", func(c *gin.Context) {
+		c.SetCookie("username", c.PostForm("username"), 3600, "/", "localhost", false, true)
+		c.Redirect(http.StatusFound, "/")
+	})
 
 	router.Run(":8000")
 }
