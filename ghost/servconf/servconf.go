@@ -84,8 +84,8 @@ func New(username string, serverName string) *ServerConfig {
 		panic(err)
 	}
 
-	cfg.username = strings.ToLower(username)
-	cfg.serverName = strings.ToLower(serverName)
+	cfg.setUsername(serverName)
+	cfg.setServerName(serverName)
 
 	return cfg
 }
@@ -94,8 +94,16 @@ func (cfg *ServerConfig) GetUsername() string {
 	return cfg.username
 }
 
+func (cfg *ServerConfig) setUsername(username string) {
+	cfg.username = strings.ToLower(username)
+}
+
 func (cfg *ServerConfig) GetServerName() string {
 	return cfg.serverName
+}
+
+func (cfg *ServerConfig) setServerName(serverName string) {
+	cfg.serverName = strings.ToLower(serverName)
 }
 
 func (cfg *ServerConfig) GetServerType() string {
