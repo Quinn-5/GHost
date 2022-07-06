@@ -84,7 +84,7 @@ func New(username string, serverName string) *ServerConfig {
 		panic(err)
 	}
 
-	cfg.setUsername(serverName)
+	cfg.setUsername(username)
 	cfg.setServerName(serverName)
 
 	return cfg
