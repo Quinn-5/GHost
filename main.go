@@ -107,9 +107,29 @@ func main() {
 		})
 	})
 
+	router.POST("/console", func(c *gin.Context) {
+		var username string
+		if cookie, err := c.Cookie("username"); err != nil {
+			c.Redirect(http.StatusFound, "/login")
+		} else {
+			username = cookie
+		}
+
+		servername := c.PostForm("servername")
+		conf := servconf.New(username, servername)
+
+		ghost.Delete(conf)
+
+		deployments := ghost.GetAllDeploymentsForUser(servconf.New(username, ""))
+		c.HTML(http.StatusOK, "console", gin.H{
+			"Servers": deployments,
+		})
+	})
+
 	router.GET("/login", func(c *gin.Context) {
 		c.HTML(http.StatusOK, "login", gin.H{})
 	})
+
 	router.POST("/login", func(c *gin.Context) {
 		c.SetCookie("username", c.PostForm("username"), 3600, "/", "localhost", false, true)
 		c.Redirect(http.StatusFound, "/")
