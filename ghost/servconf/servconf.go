@@ -1,8 +1,11 @@
 package servconf
 
 import (
+	"bytes"
+	"errors"
 	"flag"
 	"path/filepath"
+	"regexp"
 	"strings"
 
 	apiv1 "k8s.io/api/core/v1"
@@ -94,24 +97,42 @@ func (cfg *ServerConfig) GetUsername() string {
 	return cfg.username
 }
 
-func (cfg *ServerConfig) setUsername(username string) {
-	cfg.username = strings.ToLower(username)
+func (cfg *ServerConfig) setUsername(username string) error {
+	exp := regexp.MustCompile(`[a-z]([-a-z0-9]*[a-z0-9])?`)
+	if !bytes.Equal(exp.Find([]byte(username)), []byte(username)) {
+		return errors.New("username must contain only alphanumeric, lowercase characters")
+	} else {
+		cfg.username = strings.ToLower(username)
+		return nil
+	}
 }
 
 func (cfg *ServerConfig) GetServerName() string {
 	return cfg.serverName
 }
 
-func (cfg *ServerConfig) setServerName(serverName string) {
-	cfg.serverName = strings.ToLower(serverName)
+func (cfg *ServerConfig) setServerName(serverName string) error {
+	exp := regexp.MustCompile(`[a-z]([-a-z0-9]*[a-z0-9])?`)
+	if !bytes.Equal(exp.Find([]byte(serverName)), []byte(serverName)) {
+		return errors.New("servername must contain only alphanumeric, lowercase characters")
+	} else {
+		cfg.serverName = strings.ToLower(serverName)
+		return nil
+	}
 }
 
 func (cfg *ServerConfig) GetServerType() string {
 	return cfg.serverType
 }
 
-func (cfg *ServerConfig) SetType(servertype string) {
-	cfg.serverType = strings.ToLower(servertype)
+func (cfg *ServerConfig) SetType(serverType string) error {
+	exp := regexp.MustCompile(`[a-z]([-a-z0-9]*[a-z0-9])?`)
+	if !bytes.Equal(exp.Find([]byte(serverType)), []byte(serverType)) {
+		return errors.New("servertype must contain only alphanumeric, lowercase characters")
+	} else {
+		cfg.serverType = strings.ToLower(serverType)
+		return nil
+	}
 }
 
 func (cfg *ServerConfig) GetInternalPort() int32 {
