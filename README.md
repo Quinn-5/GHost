@@ -16,6 +16,17 @@ The servers themselves are run as container images that are deployed to a Kubern
 
 While this is by no means production ready, setting up a development environment is quite simple. All you need is a Kubernetes cluster, and a computer that can run Go
 
+0. You need to have some type of storageclass set up on your cluster. By default this repo is set up to use longhorn, which is pretty plug and play in my experience. To set it up, there are two commands to run on your cluster
+
+To check the environment is set up properly:
+
+```curl -sSfL https://raw.githubusercontent.com/longhorn/longhorn/v1.3.0/scripts/environment_check.sh | bash```
+
+To install longhorn on the cluster:
+
+```kubectl apply -f https://raw.githubusercontent.com/longhorn/longhorn/v1.3.0/deploy/longhorn.yaml```
+
+
 1. Download the Go programming language. I develop on the latest version
 2. Make sure you have your cluster's kubeconfig on your development machine. on linux, it should be at ``~/.kube/config``. I don't use Windows so I'm not sure, but I'd imagine it's something similar.
 3. After you've cloned the repo, navigate to it in a terminal or IDE, and run ```go run .```

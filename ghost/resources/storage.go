@@ -15,7 +15,7 @@ import (
 func CreatePersistentVolumeClaim(config *servconf.ServerConfig) {
 	storageClient := config.GetKubeConfig().CoreV1().PersistentVolumeClaims(apiv1.NamespaceDefault)
 
-	storageClass := "csi-rbd-sc"
+	storageClass := "longhorn"
 	volumeMode := apiv1.PersistentVolumeFilesystem
 
 	pvc := &apiv1.PersistentVolumeClaim{
