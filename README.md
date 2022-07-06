@@ -22,7 +22,7 @@ To check the environment is set up properly:
 
 ```curl -sSfL https://raw.githubusercontent.com/longhorn/longhorn/v1.3.0/scripts/environment_check.sh | bash```
 
-To install longhorn on the cluster:
+Install any missing dependencies this finds, then install longhorn on the cluster:
 
 ```kubectl apply -f https://raw.githubusercontent.com/longhorn/longhorn/v1.3.0/deploy/longhorn.yaml```
 
