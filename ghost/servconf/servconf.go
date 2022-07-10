@@ -17,8 +17,9 @@ import (
 
 var kubeconfig *string
 
-// ServerConfig for use in backend
-// Initialize with New()
+// Server config with private values
+// for use in backend functions.
+// Initialize with servconf.New()
 type ServerConfig struct {
 
 	// Name of user requesting server
@@ -55,7 +56,10 @@ type ServerConfig struct {
 	clientset *kubernetes.Clientset
 }
 
-type PubServConf struct {
+// Server config with public values
+// for use in web handlers.
+// Generate with servconf.WebConfig()
+type WebConfig struct {
 	Username     string
 	ServerName   string
 	ServerType   string
@@ -201,8 +205,8 @@ func (cfg *ServerConfig) GetKubeConfig() *kubernetes.Clientset {
 	return cfg.clientset
 }
 
-func (cfg *ServerConfig) PubConf() *PubServConf {
-	pconf := &PubServConf{
+func (cfg *ServerConfig) WebConfig() *WebConfig {
+	webconf := &WebConfig{
 		Username:     cfg.GetUsername(),
 		ServerName:   cfg.GetServerName(),
 		ServerType:   cfg.GetServerType(),
@@ -213,5 +217,5 @@ func (cfg *ServerConfig) PubConf() *PubServConf {
 		InternalPort: cfg.GetInternalPort(),
 		ExternalPort: cfg.GetExternalPort(),
 	}
-	return pconf
+	return webconf
 }

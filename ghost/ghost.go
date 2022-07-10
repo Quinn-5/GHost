@@ -66,11 +66,11 @@ func GetAddress(config *servconf.ServerConfig) {
 	resources.GetExternalPort(config)
 }
 
-func GetAllDeploymentsForUser(config *servconf.ServerConfig) []*servconf.PubServConf {
+func GetAllDeploymentsForUser(config *servconf.ServerConfig) []*servconf.WebConfig {
 	servconfs := resources.GetAllDeploymentsForUser(config)
-	var deployments []*servconf.PubServConf
+	var deployments []*servconf.WebConfig
 	for _, element := range servconfs {
-		deployments = append(deployments, element.PubConf())
+		deployments = append(deployments, element.WebConfig())
 	}
 	return deployments
 }

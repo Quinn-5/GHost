@@ -66,10 +66,7 @@ func resultHandler() gin.HandlerFunc {
 
 		ghost.GetAddress(conf)
 
-		ctx.HTML(http.StatusOK, "result", gin.H{
-			"IP":   conf.GetIP(),
-			"Port": conf.GetExternalPort(),
-		})
+		ctx.HTML(http.StatusOK, "result", conf.WebConfig())
 	}
 }
 
