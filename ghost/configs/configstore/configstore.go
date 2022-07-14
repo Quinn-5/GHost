@@ -1,4 +1,4 @@
-package servconf
+package configstore
 
 import (
 	"bytes"
@@ -8,6 +8,7 @@ import (
 	"regexp"
 	"strings"
 
+	"github.com/Quinn-5/GHost/ghost/configs/servconf"
 	apiv1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
 	"k8s.io/client-go/kubernetes"
@@ -20,7 +21,7 @@ var kubeconfig *string
 // Server config with private values
 // for use in backend functions.
 // Initialize with servconf.New()
-type ServerConfig struct {
+type ConfigStore struct {
 
 	// Name of user requesting server
 	username string
@@ -56,23 +57,17 @@ type ServerConfig struct {
 	clientset *kubernetes.Clientset
 }
 
-// Server config with public values
-// for use in web handlers.
-// Generate with servconf.WebConfig()
-type WebConfig struct {
-	Username     string
-	ServerName   string
-	ServerType   string
-	CPU          string
-	RAM          string
-	Disk         string
-	IP           string
-	InternalPort int32
-	ExternalPort int32
+// checks if the defined config already exists on the cluster
+func (cfg *ConfigStore) exists() bool {
+	return true
 }
 
-func New(username string, serverName string) *ServerConfig {
-	cfg := &ServerConfig{}
+func (cfg *ConfigStore) setAllValues() {
+
+}
+
+func New(username string, serverName string) *ConfigStore {
+	cfg := &ConfigStore{}
 
 	if kubeconfig == nil {
 		if home := homedir.HomeDir(); home != "" {
@@ -94,14 +89,14 @@ func New(username string, serverName string) *ServerConfig {
 	cfg.setUsername(username)
 	cfg.setServerName(serverName)
 
+	if cfg.exists() {
+		cfg.setAllValues()
+	}
+
 	return cfg
 }
 
-func (cfg *ServerConfig) GetUsername() string {
-	return cfg.username
-}
-
-func (cfg *ServerConfig) setUsername(username string) error {
+func (cfg *ConfigStore) setUsername(username string) error {
 	exp := regexp.MustCompile(`[a-z]([-a-z0-9]*[a-z0-9])?`)
 	if !bytes.Equal(exp.Find([]byte(username)), []byte(username)) {
 		return errors.New("username must contain only alphanumeric, lowercase characters")
@@ -111,11 +106,7 @@ func (cfg *ServerConfig) setUsername(username string) error {
 	}
 }
 
-func (cfg *ServerConfig) GetServerName() string {
-	return cfg.serverName
-}
-
-func (cfg *ServerConfig) setServerName(serverName string) error {
+func (cfg *ConfigStore) setServerName(serverName string) error {
 	exp := regexp.MustCompile(`[a-z]([-a-z0-9]*[a-z0-9])?`)
 	if !bytes.Equal(exp.Find([]byte(serverName)), []byte(serverName)) {
 		return errors.New("servername must contain only alphanumeric, lowercase characters")
@@ -125,11 +116,7 @@ func (cfg *ServerConfig) setServerName(serverName string) error {
 	}
 }
 
-func (cfg *ServerConfig) GetServerType() string {
-	return cfg.serverType
-}
-
-func (cfg *ServerConfig) SetType(serverType string) error {
+func (cfg *ConfigStore) SetType(serverType string) error {
 	exp := regexp.MustCompile(`[a-z]([-a-z0-9]*[a-z0-9])?`)
 	if !bytes.Equal(exp.Find([]byte(serverType)), []byte(serverType)) {
 		return errors.New("servertype must contain only alphanumeric, lowercase characters")
@@ -139,83 +126,52 @@ func (cfg *ServerConfig) SetType(serverType string) error {
 	}
 }
 
-func (cfg *ServerConfig) GetInternalPort() int32 {
-	return cfg.internalPort
-}
-
-func (cfg *ServerConfig) SetInternalPort(port int32) {
+func (cfg *ConfigStore) SetInternalPort(port int32) {
 	cfg.internalPort = port
 }
 
-func (cfg *ServerConfig) GetExternalPort() int32 {
-	return cfg.externalPort
-}
-
-func (cfg *ServerConfig) SetExternalPort(port int32) {
+func (cfg *ConfigStore) SetExternalPort(port int32) {
 	cfg.externalPort = port
 }
 
-func (cfg *ServerConfig) GetIP() string {
-	return cfg.ip
-}
-
-func (cfg *ServerConfig) SetIP(ip string) {
+func (cfg *ConfigStore) SetIP(ip string) {
 	cfg.ip = ip
 }
 
-func (cfg *ServerConfig) GetProtocol() apiv1.Protocol {
-	return cfg.protocol
-}
-
-func (cfg *ServerConfig) SetProtocol(protocol apiv1.Protocol) {
+func (cfg *ConfigStore) SetProtocol(protocol apiv1.Protocol) {
 	cfg.protocol = protocol
 }
 
-func (cfg *ServerConfig) GetCPU() resource.Quantity {
-	return cfg.cpu
-}
-
-func (cfg *ServerConfig) SetCPU(cpu string) {
+func (cfg *ConfigStore) SetCPU(cpu string) {
 	if n, err := resource.ParseQuantity(cpu); err == nil {
 		cfg.cpu = n
 	}
 }
 
-func (cfg *ServerConfig) GetRAM() resource.Quantity {
-	return cfg.ram
-}
-
-func (cfg *ServerConfig) SetRAM(ram string) {
+func (cfg *ConfigStore) SetRAM(ram string) {
 	if n, err := resource.ParseQuantity(ram + "Gi"); err == nil {
 		cfg.ram = n
 	}
 }
 
-func (cfg *ServerConfig) GetDisk() resource.Quantity {
-	return cfg.disk
-}
-
-func (cfg *ServerConfig) SetDisk(disk string) {
+func (cfg *ConfigStore) SetDisk(disk string) {
 	if n, err := resource.ParseQuantity(disk + "Gi"); err == nil {
 		cfg.disk = n
 	}
 }
 
-func (cfg *ServerConfig) GetKubeConfig() *kubernetes.Clientset {
-	return cfg.clientset
-}
-
-func (cfg *ServerConfig) WebConfig() *WebConfig {
-	webconf := &WebConfig{
-		Username:     cfg.GetUsername(),
-		ServerName:   cfg.GetServerName(),
-		ServerType:   cfg.GetServerType(),
-		CPU:          cfg.GetCPU().OpenAPISchemaFormat(),
-		RAM:          cfg.GetRAM().OpenAPISchemaFormat(),
-		Disk:         cfg.GetRAM().OpenAPISchemaFormat(),
-		IP:           cfg.GetIP(),
-		InternalPort: cfg.GetInternalPort(),
-		ExternalPort: cfg.GetExternalPort(),
+func (cfg *ConfigStore) Get() *servconf.ServerConfig {
+	return &servconf.ServerConfig{
+		Username:     cfg.username,
+		ServerName:   cfg.serverName,
+		ServerType:   cfg.serverType,
+		CPU:          cfg.cpu,
+		RAM:          cfg.ram,
+		Disk:         cfg.disk,
+		IP:           cfg.ip,
+		InternalPort: cfg.internalPort,
+		ExternalPort: cfg.externalPort,
+		Protocol:     cfg.protocol,
+		Clientset:    cfg.clientset,
 	}
-	return webconf
 }

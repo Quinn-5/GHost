@@ -17,9 +17,10 @@ package ghost
 import (
 	"errors"
 
+	"github.com/Quinn-5/GHost/ghost/configs/configstore"
+	"github.com/Quinn-5/GHost/ghost/configs/servconf"
 	"github.com/Quinn-5/GHost/ghost/deployments"
 	"github.com/Quinn-5/GHost/ghost/resources"
-	"github.com/Quinn-5/GHost/ghost/servconf"
 	v1 "k8s.io/api/apps/v1"
 	//
 	// Uncomment to load all auth plugins
@@ -32,10 +33,22 @@ import (
 	// _ "k8s.io/client-go/plugin/pkg/client/auth/openstack"
 )
 
+// checks if the defined config already exists on the cluster
+func exists(cfg *servconf.ServerConfig) bool {
+	return true
+}
+
+func SetAllValues(cfg *servconf.ServerConfig) error {
+	if exists(cfg) {
+		return nil
+	}
+	return nil
+}
+
 func Create(config *servconf.ServerConfig) error {
 	var deployment *v1.Deployment
 
-	switch config.GetServerType() {
+	switch config.ServerType {
 	case "factorio":
 		deployment = deployments.Factorio(config)
 	case "minecraft":
@@ -61,16 +74,22 @@ func Delete(config *servconf.ServerConfig) error {
 	return nil
 }
 
-func GetAddress(config *servconf.ServerConfig) {
-	resources.GetNodeIP(config)
-	resources.GetExternalPort(config)
+func GetAddress(config *configstore.ConfigStore) {
+	config.SetIP(resources.GetNodeIP(config.Get()))
+	config.SetExternalPort(resources.GetExternalPort(config.Get()))
 }
 
-func GetAllDeploymentsForUser(config *servconf.ServerConfig) []*servconf.WebConfig {
-	servconfs := resources.GetAllDeploymentsForUser(config)
-	var deployments []*servconf.WebConfig
-	for _, element := range servconfs {
-		deployments = append(deployments, element.WebConfig())
+// take a look at this later
+func GetAllDeploymentsForUser(config *servconf.ServerConfig) []*servconf.ServerConfig {
+	deploymentList := resources.ListUserDeployments(config)
+	var deployments []*servconf.ServerConfig
+	for _, element := range deploymentList.Items {
+		username := element.ObjectMeta.Labels["user"]
+		servername := element.Name
+		serverType := element.ObjectMeta.Labels["type"]
+		store := configstore.New(username, servername)
+		store.SetType(serverType)
+		deployments = append(deployments, store.Get())
 	}
 	return deployments
 }

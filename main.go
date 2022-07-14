@@ -4,7 +4,7 @@ import (
 	"net/http"
 
 	"github.com/Quinn-5/GHost/ghost"
-	"github.com/Quinn-5/GHost/ghost/servconf"
+	"github.com/Quinn-5/GHost/ghost/configs/configstore"
 	"github.com/gin-contrib/multitemplate"
 	"github.com/gin-gonic/gin"
 )
@@ -33,19 +33,19 @@ func createHandler() gin.HandlerFunc {
 		ram := ctx.PostForm("ram")
 		disk := ctx.PostForm("disk")
 
-		conf := servconf.New(username, servername)
+		conf := configstore.New(username, servername)
 		conf.SetType(servertype)
 		conf.SetCPU(cpu)
 		conf.SetRAM(ram)
 		conf.SetDisk(disk)
 
-		err := ghost.Create(conf)
+		err := ghost.Create(conf.Get())
 		if err != nil {
 			ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 			return
 		}
 
-		ctx.SetCookie("servername", conf.GetServerName(), 30, "/", "localhost", false, true)
+		ctx.SetCookie("servername", conf.Get().ServerName, 30, "/", "localhost", false, true)
 
 		ctx.Redirect(http.StatusFound, "/success")
 	}
@@ -62,11 +62,11 @@ func resultHandler() gin.HandlerFunc {
 			servername = cookie
 		}
 
-		conf := servconf.New(username, servername)
+		conf := configstore.New(username, servername)
 
 		ghost.GetAddress(conf)
 
-		ctx.HTML(http.StatusOK, "result", conf.WebConfig())
+		ctx.HTML(http.StatusOK, "result", conf.Get())
 	}
 }
 
@@ -98,7 +98,7 @@ func main() {
 		} else {
 			username = cookie
 		}
-		deployments := ghost.GetAllDeploymentsForUser(servconf.New(username, ""))
+		deployments := ghost.GetAllDeploymentsForUser(configstore.New(username, "").Get())
 		c.HTML(http.StatusOK, "console", gin.H{
 			"Servers": deployments,
 		})
@@ -113,11 +113,11 @@ func main() {
 		}
 
 		servername := c.PostForm("servername")
-		conf := servconf.New(username, servername)
+		conf := configstore.New(username, servername)
 
-		ghost.Delete(conf)
+		ghost.Delete(conf.Get())
 
-		deployments := ghost.GetAllDeploymentsForUser(servconf.New(username, ""))
+		deployments := ghost.GetAllDeploymentsForUser(configstore.New(username, "").Get())
 		c.HTML(http.StatusOK, "console", gin.H{
 			"Servers": deployments,
 		})
