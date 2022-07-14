@@ -64,7 +64,7 @@ func resultHandler() gin.HandlerFunc {
 
 		conf := configstore.New(username, servername)
 
-		ghost.GetAddress(conf)
+		// ghost.GetAddress(conf)
 
 		ctx.HTML(http.StatusOK, "result", conf.Get())
 	}

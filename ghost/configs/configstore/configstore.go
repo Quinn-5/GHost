@@ -9,6 +9,7 @@ import (
 	"strings"
 
 	"github.com/Quinn-5/GHost/ghost/configs/servconf"
+	"github.com/Quinn-5/GHost/ghost/resources"
 	apiv1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
 	"k8s.io/client-go/kubernetes"
@@ -59,11 +60,18 @@ type ConfigStore struct {
 
 // checks if the defined config already exists on the cluster
 func (cfg *ConfigStore) exists() bool {
-	return true
+	_, err := resources.GetDeployment(cfg.Get())
+	return err == nil
 }
 
 func (cfg *ConfigStore) setAllValues() {
+	deployment, _ := resources.GetDeployment(cfg.Get())
 
+	cfg.SetType(deployment.ObjectMeta.Labels["type"])
+	cfg.SetCPU(deployment.Spec.Template.Spec.Containers[0].Resources.Limits.Cpu().String())
+	cfg.SetRAM(deployment.Spec.Template.Spec.Containers[0].Resources.Limits.Memory().String())
+	cfg.SetIP(resources.GetNodeIP(cfg.Get()))
+	cfg.SetExternalPort(resources.GetExternalPort(cfg.Get()))
 }
 
 func New(username string, serverName string) *ConfigStore {

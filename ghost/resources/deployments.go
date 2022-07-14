@@ -44,17 +44,18 @@ func ListUserDeployments(config *servconf.ServerConfig) *appsv1.DeploymentList {
 		fmt.Printf("Found %d Deployments for %q.\n", len(deploymentList.Items), config.Username)
 	}
 
-	// var deployments []*servconf.ServerConfig
-
-	// for _, element := range deploymentList.Items {
-	// 	username := element.ObjectMeta.Labels["user"]
-	// 	servername := element.Name
-	// 	serverType := element.ObjectMeta.Labels["type"]
-
-	// 	conf := servconf.New(username, servername)
-	// 	conf.SetType(serverType)
-	// 	deployments = append(deployments, conf)
-	// }
-
 	return deploymentList
+}
+
+func GetDeployment(config *servconf.ServerConfig) (*appsv1.Deployment, error) {
+	deploymentClient := config.Clientset.AppsV1().Deployments(apiv1.NamespaceDefault)
+
+	fmt.Printf("Searching for Deployment %s...\n", config.ServerName)
+	deployment, err := deploymentClient.Get(context.TODO(), config.ServerName, metav1.GetOptions{})
+	if err != nil {
+		return nil, err
+	} else {
+		fmt.Printf("Found Deployment %s.\n", config.ServerName)
+		return deployment, nil
+	}
 }

@@ -33,18 +33,6 @@ import (
 	// _ "k8s.io/client-go/plugin/pkg/client/auth/openstack"
 )
 
-// checks if the defined config already exists on the cluster
-func exists(cfg *servconf.ServerConfig) bool {
-	return true
-}
-
-func SetAllValues(cfg *servconf.ServerConfig) error {
-	if exists(cfg) {
-		return nil
-	}
-	return nil
-}
-
 func Create(config *servconf.ServerConfig) error {
 	var deployment *v1.Deployment
 
@@ -86,9 +74,8 @@ func GetAllDeploymentsForUser(config *servconf.ServerConfig) []*servconf.ServerC
 	for _, element := range deploymentList.Items {
 		username := element.ObjectMeta.Labels["user"]
 		servername := element.Name
-		serverType := element.ObjectMeta.Labels["type"]
+
 		store := configstore.New(username, servername)
-		store.SetType(serverType)
 		deployments = append(deployments, store.Get())
 	}
 	return deployments
