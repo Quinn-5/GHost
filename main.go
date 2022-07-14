@@ -117,10 +117,7 @@ func main() {
 
 		ghost.Delete(conf.Get())
 
-		deployments := ghost.GetAllDeploymentsForUser(configstore.New(username, "").Get())
-		c.HTML(http.StatusOK, "console", gin.H{
-			"Servers": deployments,
-		})
+		c.Redirect(http.StatusFound, "/console")
 	})
 
 	router.GET("/login", func(c *gin.Context) {

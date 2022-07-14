@@ -62,11 +62,6 @@ func Delete(config *servconf.ServerConfig) error {
 	return nil
 }
 
-func GetAddress(config *configstore.ConfigStore) {
-	config.SetIP(resources.GetNodeIP(config.Get()))
-	config.SetExternalPort(resources.GetExternalPort(config.Get()))
-}
-
 // take a look at this later
 func GetAllDeploymentsForUser(config *servconf.ServerConfig) []*servconf.ServerConfig {
 	deploymentList := resources.ListUserDeployments(config)

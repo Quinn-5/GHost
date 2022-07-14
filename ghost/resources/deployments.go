@@ -33,6 +33,19 @@ func DeleteDeployment(config *servconf.ServerConfig) {
 	}
 }
 
+func GetDeployment(config *servconf.ServerConfig) (*appsv1.Deployment, error) {
+	deploymentClient := config.Clientset.AppsV1().Deployments(apiv1.NamespaceDefault)
+
+	fmt.Printf("Searching for Deployment %s...\n", config.ServerName)
+	deployment, err := deploymentClient.Get(context.TODO(), config.ServerName, metav1.GetOptions{})
+	if err != nil {
+		return nil, err
+	} else {
+		fmt.Printf("Found Deployment %s.\n", config.ServerName)
+		return deployment, nil
+	}
+}
+
 func ListUserDeployments(config *servconf.ServerConfig) *appsv1.DeploymentList {
 	deploymentClient := config.Clientset.AppsV1().Deployments(apiv1.NamespaceDefault)
 
@@ -45,17 +58,4 @@ func ListUserDeployments(config *servconf.ServerConfig) *appsv1.DeploymentList {
 	}
 
 	return deploymentList
-}
-
-func GetDeployment(config *servconf.ServerConfig) (*appsv1.Deployment, error) {
-	deploymentClient := config.Clientset.AppsV1().Deployments(apiv1.NamespaceDefault)
-
-	fmt.Printf("Searching for Deployment %s...\n", config.ServerName)
-	deployment, err := deploymentClient.Get(context.TODO(), config.ServerName, metav1.GetOptions{})
-	if err != nil {
-		return nil, err
-	} else {
-		fmt.Printf("Found Deployment %s.\n", config.ServerName)
-		return deployment, nil
-	}
 }

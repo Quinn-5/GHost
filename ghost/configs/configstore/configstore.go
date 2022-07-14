@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"errors"
 	"flag"
+	"fmt"
 	"path/filepath"
 	"regexp"
 	"strings"
@@ -58,20 +59,18 @@ type ConfigStore struct {
 	clientset *kubernetes.Clientset
 }
 
-// checks if the defined config already exists on the cluster
-func (cfg *ConfigStore) exists() bool {
-	_, err := resources.GetDeployment(cfg.Get())
-	return err == nil
-}
-
-func (cfg *ConfigStore) setAllValues() {
-	deployment, _ := resources.GetDeployment(cfg.Get())
-
-	cfg.SetType(deployment.ObjectMeta.Labels["type"])
-	cfg.SetCPU(deployment.Spec.Template.Spec.Containers[0].Resources.Limits.Cpu().String())
-	cfg.SetRAM(deployment.Spec.Template.Spec.Containers[0].Resources.Limits.Memory().String())
-	cfg.SetIP(resources.GetNodeIP(cfg.Get()))
-	cfg.SetExternalPort(resources.GetExternalPort(cfg.Get()))
+func (cfg *ConfigStore) setAllValues() error {
+	deployment, err := resources.GetDeployment(cfg.Get())
+	if err == nil {
+		cfg.SetType(deployment.ObjectMeta.Labels["type"])
+		cfg.SetCPU(deployment.Spec.Template.Spec.Containers[0].Resources.Limits.Cpu().String())
+		cfg.SetRAM(deployment.Spec.Template.Spec.Containers[0].Resources.Limits.Memory().String())
+		cfg.SetIP(resources.GetNodeIP(cfg.Get()))
+		cfg.SetExternalPort(resources.GetExternalPort(cfg.Get()))
+		return nil
+	} else {
+		return errors.New(fmt.Sprintf("Deployment %s does not exist", cfg.serverName))
+	}
 }
 
 func New(username string, serverName string) *ConfigStore {
@@ -96,10 +95,7 @@ func New(username string, serverName string) *ConfigStore {
 
 	cfg.setUsername(username)
 	cfg.setServerName(serverName)
-
-	if cfg.exists() {
-		cfg.setAllValues()
-	}
+	cfg.setAllValues()
 
 	return cfg
 }
