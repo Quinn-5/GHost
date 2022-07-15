@@ -47,24 +47,36 @@ func Create(config *servconf.ServerConfig) error {
 		return errors.New("Invalid server type")
 	}
 
-	resources.CreateNodeport(config)
-	resources.CreatePersistentVolumeClaim(config)
-	resources.CreateDeployment(config, deployment)
+	err := resources.CreateNodeport(config)
+	if err != nil {
+		return err
+	}
+	err = resources.CreatePersistentVolumeClaim(config)
+	if err != nil {
+		return err
+	}
+	err = resources.CreateDeployment(config, deployment)
 
-	return nil
+	return err
 }
 
 func Delete(config *servconf.ServerConfig) error {
-	resources.DeleteNodeport(config)
-	resources.DeletePersistentVolumeClaim(config)
-	resources.DeleteDeployment(config)
+	err := resources.DeleteNodeport(config)
+	if err != nil {
+		return err
+	}
+	err = resources.DeletePersistentVolumeClaim(config)
+	if err != nil {
+		return err
+	}
+	err = resources.DeleteDeployment(config)
 
-	return nil
+	return err
 }
 
 // take a look at this later
 func GetAllDeploymentsForUser(config *servconf.ServerConfig) []*servconf.ServerConfig {
-	deploymentList := resources.ListUserDeployments(config)
+	deploymentList, _ := resources.ListUserDeployments(config)
 	var deployments []*servconf.ServerConfig
 	for _, element := range deploymentList.Items {
 		username := element.ObjectMeta.Labels["user"]

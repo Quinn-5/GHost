@@ -2,6 +2,7 @@ package resources
 
 import (
 	"context"
+	"errors"
 	"fmt"
 
 	"github.com/Quinn-5/GHost/ghost/configs/servconf"
@@ -12,7 +13,7 @@ import (
 // Creates a PersistentVolumeClaim on the cluster in the default namespace, and with the given parameters
 //
 // Size should be the number of bytes requested
-func CreatePersistentVolumeClaim(config *servconf.ServerConfig) {
+func CreatePersistentVolumeClaim(config *servconf.ServerConfig) error {
 	storageClient := config.Clientset.CoreV1().PersistentVolumeClaims(apiv1.NamespaceDefault)
 
 	storageClass := "longhorn"
@@ -42,20 +43,28 @@ func CreatePersistentVolumeClaim(config *servconf.ServerConfig) {
 	fmt.Println("Creating PersistentVolumeClaim...")
 	result, err := storageClient.Create(context.TODO(), pvc, metav1.CreateOptions{})
 	if err != nil {
+		if err.Error() == fmt.Sprintf("persistentvolumeclaims \"%s\" already exists", config.ServerName) {
+			return errors.New(fmt.Sprintf("volume claim named %s already exists.", config.ServerName))
+		}
 		panic(err)
 	} else {
 		fmt.Printf("Created PersistentVolumeClaim %q.\n", result.GetObjectMeta().GetName())
+		return err
 	}
 }
 
-func DeletePersistentVolumeClaim(config *servconf.ServerConfig) {
+func DeletePersistentVolumeClaim(config *servconf.ServerConfig) error {
 	storageClient := config.Clientset.CoreV1().PersistentVolumeClaims(apiv1.NamespaceDefault)
 
 	fmt.Println("Deleting PersistentVolumeClaim...")
 	err := storageClient.Delete(context.TODO(), config.ServerName, metav1.DeleteOptions{})
 	if err != nil {
+		if err.Error() == fmt.Sprintf("persistentvolumeclaims \"%s\" not found", config.ServerName) {
+			return errors.New(fmt.Sprintf("volume claim named %s already exists.", config.ServerName))
+		}
 		panic(err)
 	} else {
 		fmt.Printf("Deleted PersistentVolumeClaim %q.\n", config.ServerName)
+		return err
 	}
 }

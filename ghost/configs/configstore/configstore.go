@@ -66,8 +66,13 @@ func (cfg *ConfigStore) setAllValues() error {
 		cfg.SetCPU(deployment.Spec.Template.Spec.Containers[0].Resources.Limits.Cpu().String())
 		cfg.SetRAM(deployment.Spec.Template.Spec.Containers[0].Resources.Limits.Memory().String())
 		cfg.SetIP(resources.GetNodeIP(cfg.Get()))
-		cfg.SetExternalPort(resources.GetExternalPort(cfg.Get()))
-		return nil
+
+		port, err := resources.GetExternalPort(cfg.Get())
+		if err == nil {
+			cfg.SetExternalPort(port)
+		}
+
+		return err
 	} else {
 		return errors.New(fmt.Sprintf("Deployment %s does not exist", cfg.serverName))
 	}
