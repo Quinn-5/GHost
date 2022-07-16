@@ -2,6 +2,7 @@ package main
 
 import (
 	"net/http"
+	"strings"
 
 	"github.com/Quinn-5/GHost/ghost"
 	"github.com/Quinn-5/GHost/ghost/configs/configstore"
@@ -16,6 +17,7 @@ func createRenderer() multitemplate.Renderer {
 	r.AddFromFiles("create", "templates/base.html", "templates/create.html")
 	r.AddFromFiles("login", "templates/base.html", "templates/login.html")
 	r.AddFromFiles("result", "templates/base.html", "templates/result.html")
+	r.AddFromFiles("edit", "templates/base.html", "templates/edit.html")
 	return r
 }
 
@@ -63,8 +65,6 @@ func resultHandler() gin.HandlerFunc {
 		}
 
 		conf := configstore.New(username, servername)
-
-		// ghost.GetAddress(conf)
 
 		ctx.HTML(http.StatusOK, "result", conf.Get())
 	}
@@ -115,9 +115,20 @@ func main() {
 		servername := c.PostForm("servername")
 		conf := configstore.New(username, servername)
 
-		ghost.Delete(conf.Get())
+		action := strings.ToLower(c.PostForm("action"))
+		switch action {
+		case "edit":
+			c.Redirect(http.StatusFound, "/edit/?server="+servername)
+			return
+		case "delete":
+			ghost.Delete(conf.Get())
+		}
 
 		c.Redirect(http.StatusFound, "/console")
+	})
+
+	router.GET("/edit", func(c *gin.Context) {
+		c.HTML(http.StatusOK, "edit", gin.H{})
 	})
 
 	router.GET("/login", func(c *gin.Context) {
