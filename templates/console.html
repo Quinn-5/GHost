@@ -1,15 +1,24 @@
 {{define "content"}}
 <div class="container mt-3">
     <h1 class="text-center">Manage Servers</h1>
+    <div class="container"></div>
+    <div class="row g-3">
     {{range .Servers}}
-    <div class="row">
-            <form method="POST">
-            <input type="hidden" name="servername" value={{.ServerName}}>
-            <label for="delete">{{.ServerName}}: {{.ServerType}}</label>
-            <input type="submit" value="delete">
-            </form>
-    </div>
+        <div class="col-4">
+            <div class="p-3 border bg-light text-center">
+                <b>{{.ServerName}}</b>
+                <p>
+                    Type: {{.ServerType}}<br>
+                    Address: {{.IP}}:{{.ExternalPort}}
+                </p> 
+                <form method="POST">
+                    <input type="hidden" name="servername" value={{.ServerName}}>
+                    <input type="submit" value="delete">
+                </form>
+            </div>
+        </div>
     {{end}}
+    </div>
     
 </div>
 {{end}}
