@@ -128,7 +128,17 @@ func main() {
 	})
 
 	router.GET("/edit", func(c *gin.Context) {
-		c.HTML(http.StatusOK, "edit", gin.H{})
+		var username string
+		if cookie, err := c.Cookie("username"); err != nil {
+			c.Redirect(http.StatusFound, "/login")
+		} else {
+			username = cookie
+		}
+
+		servername := c.Query("server")
+		conf := configstore.New(username, servername)
+
+		c.HTML(http.StatusOK, "edit", conf.Get())
 	})
 
 	router.GET("/login", func(c *gin.Context) {

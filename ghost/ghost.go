@@ -44,7 +44,7 @@ func Create(config *servconf.ServerConfig) error {
 	case "terraria":
 		deployment = deployments.Terraria(config)
 	default:
-		return errors.New("Invalid server type")
+		return errors.New("invalid server type")
 	}
 
 	err := resources.CreateNodeport(config)
