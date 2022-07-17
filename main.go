@@ -17,7 +17,9 @@ func createRenderer() multitemplate.Renderer {
 	r.AddFromFiles("create", "templates/base.html", "templates/create.html")
 	r.AddFromFiles("login", "templates/base.html", "templates/login.html")
 	r.AddFromFiles("result", "templates/base.html", "templates/result.html")
-	r.AddFromFiles("edit", "templates/base.html", "templates/edit.html")
+	r.AddFromFiles("info", "templates/base.html", "templates/serverconsole/edit.html", "templates/serverconsole/info.html")
+	r.AddFromFiles("settings", "templates/base.html", "templates/serverconsole/edit.html", "templates/serverconsole/settings.html")
+	r.AddFromFiles("terminal", "templates/base.html", "templates/serverconsole/edit.html", "templates/serverconsole/terminal.html")
 	return r
 }
 
@@ -118,7 +120,7 @@ func main() {
 		action := strings.ToLower(c.PostForm("action"))
 		switch action {
 		case "edit":
-			c.Redirect(http.StatusFound, "/edit/?server="+servername)
+			c.Redirect(http.StatusFound, "/console/"+servername)
 			return
 		case "delete":
 			ghost.Delete(conf.Get())
@@ -127,7 +129,11 @@ func main() {
 		c.Redirect(http.StatusFound, "/console")
 	})
 
-	router.GET("/edit", func(c *gin.Context) {
+	router.GET("/console/:server", func(c *gin.Context) {
+		c.Redirect(http.StatusFound, "/console/"+c.Param("server")+"/info")
+	})
+
+	router.GET("/console/:server/info", func(c *gin.Context) {
 		var username string
 		if cookie, err := c.Cookie("username"); err != nil {
 			c.Redirect(http.StatusFound, "/login")
@@ -135,10 +141,24 @@ func main() {
 			username = cookie
 		}
 
-		servername := c.Query("server")
+		servername := c.Param("server")
 		conf := configstore.New(username, servername)
 
-		c.HTML(http.StatusOK, "edit", conf.Get())
+		c.HTML(http.StatusOK, "info", conf.Get())
+	})
+
+	router.GET("/console/:server/terminal", func(c *gin.Context) {
+		var username string
+		if cookie, err := c.Cookie("username"); err != nil {
+			c.Redirect(http.StatusFound, "/login")
+		} else {
+			username = cookie
+		}
+
+		servername := c.Param("server")
+		conf := configstore.New(username, servername)
+
+		c.HTML(http.StatusOK, "terminal", conf.Get())
 	})
 
 	router.GET("/login", func(c *gin.Context) {
