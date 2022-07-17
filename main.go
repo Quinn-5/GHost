@@ -147,6 +147,20 @@ func main() {
 		c.HTML(http.StatusOK, "info", conf.Get())
 	})
 
+	router.GET("/console/:server/settings", func(c *gin.Context) {
+		var username string
+		if cookie, err := c.Cookie("username"); err != nil {
+			c.Redirect(http.StatusFound, "/login")
+		} else {
+			username = cookie
+		}
+
+		servername := c.Param("server")
+		conf := configstore.New(username, servername)
+
+		c.HTML(http.StatusOK, "settings", conf.Get())
+	})
+
 	router.GET("/console/:server/terminal", func(c *gin.Context) {
 		var username string
 		if cookie, err := c.Cookie("username"); err != nil {
