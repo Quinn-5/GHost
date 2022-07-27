@@ -4,6 +4,7 @@ import (
 	"github.com/Quinn-5/GHost/ghost/configs/servconf"
 	appsv1 "k8s.io/api/apps/v1"
 	apiv1 "k8s.io/api/core/v1"
+	"k8s.io/apimachinery/pkg/api/resource"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
@@ -41,6 +42,10 @@ func Terraria(config *servconf.ServerConfig) *appsv1.Deployment {
 								Limits: apiv1.ResourceList{
 									apiv1.ResourceCPU:    config.CPU,
 									apiv1.ResourceMemory: config.RAM,
+								},
+								Requests: apiv1.ResourceList{
+									apiv1.ResourceCPU:    resource.MustParse("0"),
+									apiv1.ResourceMemory: resource.MustParse("0"),
 								},
 							},
 
