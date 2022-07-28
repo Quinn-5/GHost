@@ -2,7 +2,6 @@ package resources
 
 import (
 	"context"
-	"errors"
 	"fmt"
 
 	"github.com/Quinn-5/GHost/ghost/configs/servconf"
@@ -38,7 +37,7 @@ func CreateNodeport(config *servconf.ServerConfig) error {
 	result, err := servicesClient.Create(context.TODO(), nodeport, metav1.CreateOptions{})
 	if err != nil {
 		if err.Error() == fmt.Sprintf("services \"%s\" already exists", config.ServerName) {
-			return errors.New(fmt.Sprintf("nodeport named %s already exists.", config.ServerName))
+			return fmt.Errorf("nodeport named %s already exists", config.ServerName)
 		}
 		panic(err)
 	} else {
@@ -55,7 +54,7 @@ func DeleteNodeport(config *servconf.ServerConfig) error {
 	err := servicesClient.Delete(context.TODO(), config.ServerName, metav1.DeleteOptions{})
 	if err != nil {
 		if err.Error() == fmt.Sprintf("services \"%s\" not found", config.ServerName) {
-			return errors.New(fmt.Sprintf("nodeport named %s doesn't exist.", config.ServerName))
+			return fmt.Errorf("nodeport named %s doesn't exist", config.ServerName)
 		}
 		panic(err)
 	} else {
@@ -71,7 +70,7 @@ func GetExternalPort(config *servconf.ServerConfig) (int32, error) {
 	result, err := servicesClient.Get(context.TODO(), config.ServerName, metav1.GetOptions{})
 	if err != nil {
 		if err.Error() == fmt.Sprintf("services \"%s\" not found", config.ServerName) {
-			return 1, errors.New(fmt.Sprintf("nodeport named %s doesn't exist.", config.ServerName))
+			return 1, fmt.Errorf("nodeport named %s doesn't exist", config.ServerName)
 		}
 		panic(err)
 	} else {

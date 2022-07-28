@@ -2,7 +2,6 @@ package resources
 
 import (
 	"context"
-	"errors"
 	"fmt"
 
 	"github.com/Quinn-5/GHost/ghost/configs/servconf"
@@ -44,7 +43,7 @@ func CreatePersistentVolumeClaim(config *servconf.ServerConfig) error {
 	result, err := storageClient.Create(context.TODO(), pvc, metav1.CreateOptions{})
 	if err != nil {
 		if err.Error() == fmt.Sprintf("persistentvolumeclaims \"%s\" already exists", config.ServerName) {
-			return errors.New(fmt.Sprintf("volume claim named %s already exists.", config.ServerName))
+			return fmt.Errorf("volume claim named %s already exists", config.ServerName)
 		}
 		panic(err)
 	} else {
@@ -60,7 +59,7 @@ func DeletePersistentVolumeClaim(config *servconf.ServerConfig) error {
 	err := storageClient.Delete(context.TODO(), config.ServerName, metav1.DeleteOptions{})
 	if err != nil {
 		if err.Error() == fmt.Sprintf("persistentvolumeclaims \"%s\" not found", config.ServerName) {
-			return errors.New(fmt.Sprintf("volume claim named %s already exists.", config.ServerName))
+			return fmt.Errorf("volume claim named %s already exists", config.ServerName)
 		}
 		panic(err)
 	} else {

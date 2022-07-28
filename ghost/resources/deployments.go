@@ -18,7 +18,7 @@ func CreateDeployment(config *servconf.ServerConfig, deployment *appsv1.Deployme
 	result, err := deploymentsClient.Create(context.TODO(), deployment, metav1.CreateOptions{})
 	if err != nil {
 		if err.Error() == fmt.Sprintf("deployments.apps \"%s\" already exists", config.ServerName) {
-			return errors.New(fmt.Sprintf("Server named %s already exists. Please pick a different name.", config.ServerName))
+			return fmt.Errorf("server named %s already exists. Please pick a different name", config.ServerName)
 		}
 		panic(err)
 	}
@@ -33,7 +33,7 @@ func DeleteDeployment(config *servconf.ServerConfig) error {
 	err := deploymentClient.Delete(context.TODO(), config.ServerName, metav1.DeleteOptions{})
 	if err != nil {
 		if err.Error() == fmt.Sprintf("deployments.apps \"%s\" not found", config.ServerName) {
-			return errors.New(fmt.Sprintf("Server named %s doesn't exist.", config.ServerName))
+			return fmt.Errorf("server named %s doesn't exist", config.ServerName)
 		}
 		panic(err)
 	} else {
@@ -48,10 +48,10 @@ func GetDeployment(config *servconf.ServerConfig) (*appsv1.Deployment, error) {
 	fmt.Printf("Searching for Deployment %s...\n", config.ServerName)
 	deployment, err := deploymentClient.Get(context.TODO(), config.ServerName, metav1.GetOptions{})
 	if err != nil {
-		if err.Error() == fmt.Sprintf("resource name may not be empty") {
-			return nil, errors.New("No server name provided.")
+		if err.Error() == "resource name may not be empty" {
+			return nil, errors.New("no server name provided")
 		} else if err.Error() == fmt.Sprintf("deployments.apps \"%s\" not found", config.ServerName) {
-			return nil, errors.New(fmt.Sprintf("Server named %s doesn't exist.", config.ServerName))
+			return nil, fmt.Errorf("server named %s doesn't exist", config.ServerName)
 		}
 		panic(err)
 	} else {
