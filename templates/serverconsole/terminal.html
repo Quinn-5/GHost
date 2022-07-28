@@ -15,11 +15,42 @@
     var term = new Terminal({
         cursorBlink: "block"
     });
+    const ws = new WebSocket("ws://localhost:3000", "echo-protocol")
+    var curr_line = "";
+    var entries = [];
     term.open(document.getElementById("terminal"));
-    term.write("GHost shell $ ");
-    
-    term.onData((data) => {
-        term.write(data);
+    // term.write("GHost shell $ ");
+
+    term.prompt = () => {
+        if (curr_line) {
+            ws.send(curr_line);
+        }
+    };
+    term.prompt();
+
+    ws.onmessage = msg => {
+        term.write(msg.data.replace(/\n*$/, ""));
+        curr_line = "";
+    }
+
+    term.onData(e => {
+        if (e == '\r') {
+            if (curr_line) {
+                entries.push(curr_line);
+                term.write('\r\n');
+                term.prompt();
+            }
+        } else if (e == '\u007F') {
+            if (curr_line) {
+                curr_line = curr_line.slice(0, curr_line.length - 1)
+                term.write("\b \b")
+            }
+        } else {
+            curr_line += e;
+            term.write(e);
+        }
     });
 </script>
+
+<script src="/static/js/xterm.js"></script>
 {{end}}
