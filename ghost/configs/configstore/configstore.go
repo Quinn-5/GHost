@@ -14,6 +14,7 @@ import (
 	apiv1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
 	"k8s.io/client-go/kubernetes"
+	"k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/clientcmd"
 	"k8s.io/client-go/util/homedir"
 )
@@ -55,7 +56,10 @@ type ConfigStore struct {
 	// Protocol used for communication
 	protocol apiv1.Protocol
 
-	// kubeconfig
+	// rest config for direct connections
+	kubeconfig *rest.Config
+
+	// Kubernetes clientset
 	clientset *kubernetes.Clientset
 }
 
@@ -74,12 +78,13 @@ func (cfg *ConfigStore) setAllValues() error {
 
 		return err
 	} else {
-		return errors.New(fmt.Sprintf("Deployment %s does not exist", cfg.serverName))
+		return fmt.Errorf("deployment %s does not exist", cfg.serverName)
 	}
 }
 
 func New(username string, serverName string) *ConfigStore {
 	cfg := &ConfigStore{}
+	var err error
 
 	if kubeconfig == nil {
 		if home := homedir.HomeDir(); home != "" {
@@ -89,11 +94,11 @@ func New(username string, serverName string) *ConfigStore {
 		}
 		flag.Parse()
 	}
-	config, err := clientcmd.BuildConfigFromFlags("", *kubeconfig)
+	cfg.kubeconfig, err = clientcmd.BuildConfigFromFlags("", *kubeconfig)
 	if err != nil {
 		panic(err)
 	}
-	cfg.clientset, err = kubernetes.NewForConfig(config)
+	cfg.clientset, err = kubernetes.NewForConfig(cfg.kubeconfig)
 	if err != nil {
 		panic(err)
 	}
@@ -181,6 +186,7 @@ func (cfg *ConfigStore) Get() *servconf.ServerConfig {
 		InternalPort: cfg.internalPort,
 		ExternalPort: cfg.externalPort,
 		Protocol:     cfg.protocol,
+		Config:       cfg.kubeconfig,
 		Clientset:    cfg.clientset,
 	}
 }

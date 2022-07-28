@@ -4,6 +4,7 @@ import (
 	apiv1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
 	"k8s.io/client-go/kubernetes"
+	"k8s.io/client-go/rest"
 )
 
 type ServerConfig struct {
@@ -17,5 +18,6 @@ type ServerConfig struct {
 	InternalPort int32
 	ExternalPort int32
 	Protocol     apiv1.Protocol
+	Config       *rest.Config
 	Clientset    *kubernetes.Clientset
 }
