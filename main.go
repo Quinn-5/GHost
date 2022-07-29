@@ -171,6 +171,7 @@ func main() {
 
 		servername := c.Param("server")
 		conf := configstore.New(username, servername)
+		ghost.NewTerminal(conf.Get())
 
 		c.HTML(http.StatusOK, "terminal", conf.Get())
 	})

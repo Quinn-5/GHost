@@ -87,3 +87,7 @@ func GetAllDeploymentsForUser(config *servconf.ServerConfig) []*servconf.ServerC
 	}
 	return deployments
 }
+
+func NewTerminal(config *servconf.ServerConfig) {
+	resources.Exec(config)
+}
