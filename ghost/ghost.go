@@ -16,6 +16,7 @@ package ghost
 
 import (
 	"errors"
+	"os"
 
 	"github.com/Quinn-5/GHost/ghost/configs/configstore"
 	"github.com/Quinn-5/GHost/ghost/configs/servconf"
@@ -89,5 +90,7 @@ func GetAllDeploymentsForUser(config *servconf.ServerConfig) []*servconf.ServerC
 }
 
 func NewTerminal(config *servconf.ServerConfig) {
-	resources.Exec(config)
+	stdin := os.Stdin
+	stdout := os.Stdout
+	resources.Exec(config, stdin, stdout)
 }

@@ -3,7 +3,7 @@ package resources
 import (
 	"context"
 	"fmt"
-	"os"
+	"io"
 
 	"github.com/Quinn-5/GHost/ghost/configs/servconf"
 	apiv1 "k8s.io/api/core/v1"
@@ -27,7 +27,7 @@ func GetPod(config *servconf.ServerConfig) *apiv1.Pod {
 	return &pod
 }
 
-func Exec(config *servconf.ServerConfig) error {
+func Exec(config *servconf.ServerConfig, stdin io.Reader, stdout io.Writer) error {
 	podname := GetPod(config).Name
 
 	req := config.Clientset.CoreV1().RESTClient().Post().
@@ -49,15 +49,15 @@ func Exec(config *servconf.ServerConfig) error {
 		return err
 	}
 
-	err = exec.Stream(remotecommand.StreamOptions{
-		Stdin:  os.Stdin,
-		Stdout: os.Stdout,
+	go exec.Stream(remotecommand.StreamOptions{
+		Stdin:  stdin,
+		Stdout: stdout,
 		Stderr: nil,
 		Tty:    true,
 	})
 
-	if err != nil {
-		return err
-	}
+	// if err != nil {
+	// 	return err
+	// }
 	return nil
 }
