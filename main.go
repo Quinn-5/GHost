@@ -1,6 +1,8 @@
 package main
 
 import (
+	"bufio"
+	"fmt"
 	"net/http"
 	"strings"
 
@@ -8,6 +10,7 @@ import (
 	"github.com/Quinn-5/GHost/ghost/configs/configstore"
 	"github.com/gin-contrib/multitemplate"
 	"github.com/gin-gonic/gin"
+	"github.com/gorilla/websocket"
 )
 
 func createRenderer() multitemplate.Renderer {
@@ -171,9 +174,40 @@ func main() {
 
 		servername := c.Param("server")
 		conf := configstore.New(username, servername)
-		ghost.NewTerminal(conf.Get())
 
 		c.HTML(http.StatusOK, "terminal", conf.Get())
+	})
+
+	var upgrader = websocket.Upgrader{
+		ReadBufferSize:  1024,
+		WriteBufferSize: 1024,
+	}
+
+	router.GET("/console/:server/terminal/shell", func(c *gin.Context) {
+		var username string
+		if cookie, err := c.Cookie("username"); err != nil {
+			c.Redirect(http.StatusFound, "/login")
+		} else {
+			username = cookie
+		}
+
+		servername := c.Param("server")
+		conf := configstore.New(username, servername)
+		dataOut, _ := ghost.NewTerminal(conf.Get())
+
+		conn, err := upgrader.Upgrade(c.Writer, c.Request, nil)
+		if err != nil {
+			c.Writer.Write([]byte(fmt.Sprint("", err)))
+			return
+		}
+		defer conn.Close()
+
+		for {
+			s := bufio.NewScanner(dataOut)
+			for s.Scan() {
+				conn.WriteMessage(1, s.Bytes())
+			}
+		}
 	})
 
 	router.GET("/login", func(c *gin.Context) {

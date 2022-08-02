@@ -15,7 +15,7 @@
     var term = new Terminal({
         cursorBlink: "block"
     });
-    const ws = new WebSocket("ws://localhost:3000", "echo-protocol")
+    const ws = new WebSocket("ws://localhost:8000/console/{{.ServerName}}/terminal/shell", "echo-protocol")
     var curr_line = "";
     var entries = [];
     term.open(document.getElementById("terminal"));

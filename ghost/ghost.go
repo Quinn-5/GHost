@@ -16,7 +16,7 @@ package ghost
 
 import (
 	"errors"
-	"os"
+	"io"
 
 	"github.com/Quinn-5/GHost/ghost/configs/configstore"
 	"github.com/Quinn-5/GHost/ghost/configs/servconf"
@@ -89,8 +89,9 @@ func GetAllDeploymentsForUser(config *servconf.ServerConfig) []*servconf.ServerC
 	return deployments
 }
 
-func NewTerminal(config *servconf.ServerConfig) {
-	stdin := os.Stdin
-	stdout := os.Stdout
-	resources.Exec(config, stdin, stdout)
+func NewTerminal(config *servconf.ServerConfig) (io.Reader, io.Writer) {
+	podIn, dataIn := io.Pipe()
+	dataOut, podOut := io.Pipe()
+	resources.Exec(config, podIn, podOut)
+	return dataOut, dataIn
 }

@@ -37,7 +37,7 @@ func Exec(config *servconf.ServerConfig, stdin io.Reader, stdout io.Writer) erro
 		SubResource("exec")
 
 	req.VersionedParams(&apiv1.PodExecOptions{
-		Command: []string{"bash"},
+		Command: []string{"ls"},
 		Stdin:   true,
 		Stdout:  true,
 		Stderr:  false,

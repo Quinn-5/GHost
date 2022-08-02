@@ -15,7 +15,7 @@ import (
 func CreatePersistentVolumeClaim(config *servconf.ServerConfig) error {
 	storageClient := config.Clientset.CoreV1().PersistentVolumeClaims(apiv1.NamespaceDefault)
 
-	storageClass := "longhorn"
+	storageClass := "standard"
 	volumeMode := apiv1.PersistentVolumeFilesystem
 
 	pvc := &apiv1.PersistentVolumeClaim{
