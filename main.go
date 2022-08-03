@@ -1,8 +1,8 @@
 package main
 
 import (
-	"bufio"
 	"fmt"
+	"log"
 	"net/http"
 	"strings"
 
@@ -193,7 +193,10 @@ func main() {
 
 		servername := c.Param("server")
 		conf := configstore.New(username, servername)
-		dataOut, _ := ghost.NewTerminal(conf.Get())
+		dataOut, dataIn := ghost.NewTerminal(conf.Get())
+
+		// go io.Copy(dataIn, os.Stdin)
+		// go io.Copy(os.Stdout, dataOut)
 
 		conn, err := upgrader.Upgrade(c.Writer, c.Request, nil)
 		if err != nil {
@@ -202,12 +205,28 @@ func main() {
 		}
 		defer conn.Close()
 
-		for {
-			s := bufio.NewScanner(dataOut)
-			for s.Scan() {
-				conn.WriteMessage(1, s.Bytes())
+		go func() {
+			for {
+				buf := make([]byte, 1024)
+				dataOut.Read(buf)
+				err = conn.WriteMessage(1, buf)
+				if err != nil {
+					log.Println("Error writing message: ", err)
+					return
+				}
 			}
+		}()
+		// go func() {
+		for {
+			_, message, err := conn.ReadMessage()
+			if err != nil {
+				log.Println("Error reading message: ", err)
+				return
+			}
+			dataIn.Write(append(message, byte('\n')))
 		}
+		// }()
+
 	})
 
 	router.GET("/login", func(c *gin.Context) {
