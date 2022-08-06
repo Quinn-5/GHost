@@ -33,6 +33,15 @@ func Minecraft(config *servconf.ServerConfig) *appsv1.Deployment {
 									Name:  "EULA",
 									Value: "TRUE",
 								},
+								{
+									Name:  "MEMORY",
+									Value: "",
+								},
+								// Allow JVM heap to use 80% of the container's memory
+								{
+									Name:  "JVM_XX_OPTS",
+									Value: "-XX:MaxRAMPercentage=80",
+								},
 							},
 							Image: "itzg/minecraft-server",
 							Stdin: true,
