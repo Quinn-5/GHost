@@ -19,7 +19,6 @@
     var curr_line = "";
     var entries = [];
     term.open(document.getElementById("terminal"));
-    // term.write("GHost shell $ ");
 
     term.prompt = () => {
         if (curr_line) {
@@ -37,7 +36,7 @@
         if (e == '\r') {
             if (curr_line) {
                 entries.push(curr_line);
-                term.write('\r\n');
+                term.write("\b".repeat(curr_line.length))
                 term.prompt();
             }
         } else if (e == '\u007F') {
