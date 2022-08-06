@@ -75,6 +75,53 @@ func resultHandler() gin.HandlerFunc {
 	}
 }
 
+func shellHandler() gin.HandlerFunc {
+	var upgrader = websocket.Upgrader{
+		ReadBufferSize:  1024,
+		WriteBufferSize: 1024,
+	}
+
+	return func(c *gin.Context) {
+		var username string
+		if cookie, err := c.Cookie("username"); err != nil {
+			c.Redirect(http.StatusFound, "/login")
+		} else {
+			username = cookie
+		}
+
+		servername := c.Param("server")
+		conf := configstore.New(username, servername)
+		dataOut, dataIn := ghost.NewTerminal(conf.Get())
+
+		conn, err := upgrader.Upgrade(c.Writer, c.Request, nil)
+		if err != nil {
+			c.Writer.Write([]byte(fmt.Sprint("", err)))
+			return
+		}
+		defer conn.Close()
+
+		go func() {
+			for {
+				buf := make([]byte, 1024)
+				dataOut.Read(buf)
+				err = conn.WriteMessage(1, buf)
+				if err != nil {
+					log.Println("Error writing message: ", err)
+					return
+				}
+			}
+		}()
+		for {
+			_, message, err := conn.ReadMessage()
+			if err != nil {
+				log.Println("Error reading message: ", err)
+				return
+			}
+			dataIn.Write(append(message, byte('\n')))
+		}
+	}
+}
+
 func main() {
 	router := gin.Default()
 	router.Static("/static", "./static")
@@ -178,56 +225,7 @@ func main() {
 		c.HTML(http.StatusOK, "terminal", conf.Get())
 	})
 
-	var upgrader = websocket.Upgrader{
-		ReadBufferSize:  1024,
-		WriteBufferSize: 1024,
-	}
-
-	router.GET("/console/:server/terminal/shell", func(c *gin.Context) {
-		var username string
-		if cookie, err := c.Cookie("username"); err != nil {
-			c.Redirect(http.StatusFound, "/login")
-		} else {
-			username = cookie
-		}
-
-		servername := c.Param("server")
-		conf := configstore.New(username, servername)
-		dataOut, dataIn := ghost.NewTerminal(conf.Get())
-
-		// go io.Copy(dataIn, os.Stdin)
-		// go io.Copy(os.Stdout, dataOut)
-
-		conn, err := upgrader.Upgrade(c.Writer, c.Request, nil)
-		if err != nil {
-			c.Writer.Write([]byte(fmt.Sprint("", err)))
-			return
-		}
-		defer conn.Close()
-
-		go func() {
-			for {
-				buf := make([]byte, 1024)
-				dataOut.Read(buf)
-				err = conn.WriteMessage(1, buf)
-				if err != nil {
-					log.Println("Error writing message: ", err)
-					return
-				}
-			}
-		}()
-		// go func() {
-		for {
-			_, message, err := conn.ReadMessage()
-			if err != nil {
-				log.Println("Error reading message: ", err)
-				return
-			}
-			dataIn.Write(append(message, byte('\n')))
-		}
-		// }()
-
-	})
+	router.GET("/console/:server/terminal/shell", shellHandler())
 
 	router.GET("/login", func(c *gin.Context) {
 		c.HTML(http.StatusOK, "login", gin.H{})
