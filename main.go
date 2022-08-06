@@ -26,6 +26,16 @@ func createRenderer() multitemplate.Renderer {
 	return r
 }
 
+func cookieCheck(ctx *gin.Context) string {
+	var username string
+	if cookie, err := ctx.Cookie("username"); err != nil {
+		ctx.Redirect(http.StatusFound, "/login")
+	} else {
+		username = cookie
+	}
+	return username
+}
+
 func createHandler() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		var username string
@@ -82,12 +92,7 @@ func shellHandler() gin.HandlerFunc {
 	}
 
 	return func(c *gin.Context) {
-		var username string
-		if cookie, err := c.Cookie("username"); err != nil {
-			c.Redirect(http.StatusFound, "/login")
-		} else {
-			username = cookie
-		}
+		username := cookieCheck(c)
 
 		servername := c.Param("server")
 		conf := configstore.New(username, servername)
@@ -144,12 +149,7 @@ func main() {
 	router.GET("/success", resultHandler())
 
 	router.GET("/console", func(c *gin.Context) {
-		var username string
-		if cookie, err := c.Cookie("username"); err != nil {
-			c.Redirect(http.StatusFound, "/login")
-		} else {
-			username = cookie
-		}
+		username := cookieCheck(c)
 		deployments := ghost.GetAllDeploymentsForUser(configstore.New(username, "").Get())
 		c.HTML(http.StatusOK, "console", gin.H{
 			"Servers": deployments,
@@ -157,12 +157,7 @@ func main() {
 	})
 
 	router.POST("/console", func(c *gin.Context) {
-		var username string
-		if cookie, err := c.Cookie("username"); err != nil {
-			c.Redirect(http.StatusFound, "/login")
-		} else {
-			username = cookie
-		}
+		username := cookieCheck(c)
 
 		servername := c.PostForm("servername")
 		conf := configstore.New(username, servername)
@@ -184,12 +179,7 @@ func main() {
 	})
 
 	router.GET("/console/:server/info", func(c *gin.Context) {
-		var username string
-		if cookie, err := c.Cookie("username"); err != nil {
-			c.Redirect(http.StatusFound, "/login")
-		} else {
-			username = cookie
-		}
+		username := cookieCheck(c)
 
 		servername := c.Param("server")
 		conf := configstore.New(username, servername)
@@ -198,12 +188,7 @@ func main() {
 	})
 
 	router.GET("/console/:server/settings", func(c *gin.Context) {
-		var username string
-		if cookie, err := c.Cookie("username"); err != nil {
-			c.Redirect(http.StatusFound, "/login")
-		} else {
-			username = cookie
-		}
+		username := cookieCheck(c)
 
 		servername := c.Param("server")
 		conf := configstore.New(username, servername)
@@ -212,12 +197,7 @@ func main() {
 	})
 
 	router.GET("/console/:server/terminal", func(c *gin.Context) {
-		var username string
-		if cookie, err := c.Cookie("username"); err != nil {
-			c.Redirect(http.StatusFound, "/login")
-		} else {
-			username = cookie
-		}
+		username := cookieCheck(c)
 
 		servername := c.Param("server")
 		conf := configstore.New(username, servername)
