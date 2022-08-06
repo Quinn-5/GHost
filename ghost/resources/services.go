@@ -39,11 +39,10 @@ func CreateNodeport(config *servconf.ServerConfig) error {
 		if err.Error() == fmt.Sprintf("services \"%s\" already exists", config.ServerName) {
 			return fmt.Errorf("nodeport named %s already exists", config.ServerName)
 		}
-		panic(err)
 	} else {
 		fmt.Printf("Created NodePort %q.\n", result.GetObjectMeta().GetName())
-		return err
 	}
+	return err
 
 }
 
@@ -56,11 +55,10 @@ func DeleteNodeport(config *servconf.ServerConfig) error {
 		if err.Error() == fmt.Sprintf("services \"%s\" not found", config.ServerName) {
 			return fmt.Errorf("nodeport named %s doesn't exist", config.ServerName)
 		}
-		panic(err)
 	} else {
 		fmt.Printf("Deleted NodePort %q.\n", config.ServerName)
-		return err
 	}
+	return err
 }
 
 func GetExternalPort(config *servconf.ServerConfig) (int32, error) {
@@ -72,7 +70,7 @@ func GetExternalPort(config *servconf.ServerConfig) (int32, error) {
 		if err.Error() == fmt.Sprintf("services \"%s\" not found", config.ServerName) {
 			return 1, fmt.Errorf("nodeport named %s doesn't exist", config.ServerName)
 		}
-		panic(err)
+		return 0, err
 	} else {
 		fmt.Printf("Found NodePort %q.\n", config.ServerName)
 		port := result.Spec.Ports[0].NodePort

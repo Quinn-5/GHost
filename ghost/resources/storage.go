@@ -45,11 +45,10 @@ func CreatePersistentVolumeClaim(config *servconf.ServerConfig) error {
 		if err.Error() == fmt.Sprintf("persistentvolumeclaims \"%s\" already exists", config.ServerName) {
 			return fmt.Errorf("volume claim named %s already exists", config.ServerName)
 		}
-		panic(err)
 	} else {
 		fmt.Printf("Created PersistentVolumeClaim %q.\n", result.GetObjectMeta().GetName())
-		return err
 	}
+	return err
 }
 
 func DeletePersistentVolumeClaim(config *servconf.ServerConfig) error {
@@ -61,9 +60,8 @@ func DeletePersistentVolumeClaim(config *servconf.ServerConfig) error {
 		if err.Error() == fmt.Sprintf("persistentvolumeclaims \"%s\" not found", config.ServerName) {
 			return fmt.Errorf("volume claim named %s already exists", config.ServerName)
 		}
-		panic(err)
 	} else {
 		fmt.Printf("Deleted PersistentVolumeClaim %q.\n", config.ServerName)
-		return err
 	}
+	return err
 }

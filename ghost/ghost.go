@@ -54,9 +54,15 @@ func Create(config *servconf.ServerConfig) error {
 	}
 	err = resources.CreatePersistentVolumeClaim(config)
 	if err != nil {
+		resources.DeleteNodeport(config)
 		return err
 	}
 	err = resources.CreateDeployment(config, deployment)
+	if err != nil {
+		resources.DeleteNodeport(config)
+		resources.DeletePersistentVolumeClaim(config)
+		return err
+	}
 
 	return err
 }
