@@ -36,14 +36,18 @@
         if (e == '\r') {
             if (curr_line) {
                 entries.push(curr_line);
-                term.write("\b".repeat(curr_line.length))
+                term.write("\b".repeat(curr_line.length));
                 term.prompt();
             }
         } else if (e == '\u007F') {
             if (curr_line) {
-                curr_line = curr_line.slice(0, curr_line.length - 1)
-                term.write("\b \b")
+                curr_line = curr_line.slice(0, curr_line.length - 1);
+                term.write("\b \b");
             }
+        } else if (e == '\u0003') {
+                curr_line += e;
+                term.write(e);
+                term.prompt();
         } else {
             curr_line += e;
             term.write(e);
