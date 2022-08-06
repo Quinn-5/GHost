@@ -27,7 +27,7 @@ func GetPod(config *servconf.ServerConfig) *apiv1.Pod {
 	return &pod
 }
 
-func Exec(config *servconf.ServerConfig, stdin io.Reader, stdout io.Writer) error {
+func ShellPrompt(config *servconf.ServerConfig, stdin io.Reader, stdout io.Writer) error {
 	podname := GetPod(config).Name
 
 	req := config.Clientset.CoreV1().RESTClient().Post().
@@ -56,8 +56,5 @@ func Exec(config *servconf.ServerConfig, stdin io.Reader, stdout io.Writer) erro
 		Tty:    true,
 	})
 
-	// if err != nil {
-	// 	return err
-	// }
 	return nil
 }

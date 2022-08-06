@@ -92,6 +92,6 @@ func GetAllDeploymentsForUser(config *servconf.ServerConfig) []*servconf.ServerC
 func NewTerminal(config *servconf.ServerConfig) (io.Reader, io.Writer) {
 	podIn, dataIn := io.Pipe()
 	dataOut, podOut := io.Pipe()
-	resources.Exec(config, podIn, podOut)
+	resources.ShellPrompt(config, podIn, podOut)
 	return dataOut, dataIn
 }
