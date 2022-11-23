@@ -7,6 +7,7 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
+// Returns the IP address of the node currently running the server described in the ServerConfig
 func GetNodeIP(config *servconf.ServerConfig) string {
 	nodesClient := config.Clientset.CoreV1().Nodes()
 

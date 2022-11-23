@@ -12,6 +12,7 @@ import (
 	"k8s.io/client-go/tools/remotecommand"
 )
 
+// Returns a Pod struct corresponding to the ServerConfig provided
 func GetPod(config *servconf.ServerConfig) *apiv1.Pod {
 	podsClient := config.Clientset.CoreV1().Pods(apiv1.NamespaceDefault)
 
@@ -27,6 +28,8 @@ func GetPod(config *servconf.ServerConfig) *apiv1.Pod {
 	return &pod
 }
 
+// ShellPrompt takes a ServerConfig, an input stream, and an output stream.
+// A bash shell is executed, and the io streams are attached to the process
 func ShellPrompt(config *servconf.ServerConfig, stdin io.Reader, stdout io.Writer) error {
 	podname := GetPod(config).Name
 
